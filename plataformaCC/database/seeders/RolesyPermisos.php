@@ -17,10 +17,44 @@ class RolesyPermisos extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Crear roles
-        Role::create(['name' => 'admin', 'guard_name' => 'web']);
-        Role::create(['name' => 'usuario', 'guard_name' => 'web']);
-        Role::create(['name' => 'supervisor', 'guard_name' => 'web']);
+        $admin = Role::create(['name' => 'admin']);
+        $usuario = Role::create(['name' => 'usuario']);
+        $supervisor = Role::create(['name' => 'supervisor']);
 
+        // Crear permisos básicos
+        $permissions = [
+            'ver-dashboard',
+            'gestionar-usuarios',
+            'gestionar-proveedores',
+            'gestionar-camiones',
+            'gestionar-rto',
+            'ver-reportes',
+            'editar-rto',
+            'eliminar-rto'
+        ];
+
+        foreach ($permissions as $permission) {
+            Permission::create(['name' => $permission]);
+        }
+
+        // Asignar todos los permisos al admin
+        $admin->givePermissionTo(Permission::all());
+        
+        // Asignar permisos básicos al usuario
+        $usuario->givePermissionTo([
+            'ver-dashboard',
+            'ver-reportes'
+        ]);
+        
+        // Asignar permisos al supervisor
+        $supervisor->givePermissionTo([
+            'ver-dashboard',
+            'gestionar-rto',
+            'ver-reportes',
+            'editar-rto'
+        ]);
+
+        
         // Crear usuario administrador
         $user = Usuario::create([
             'nombreUsuario' => 'Admin',

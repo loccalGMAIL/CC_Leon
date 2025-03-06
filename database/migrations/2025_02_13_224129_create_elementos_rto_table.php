@@ -9,7 +9,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('elementos_rto', function (Blueprint $table) {
-            $table->increments('idElementoRto');
+            $table->id();
             $table->text('descripcionElementoRto');
             $table->timestamps();
             $table->softDeletes();

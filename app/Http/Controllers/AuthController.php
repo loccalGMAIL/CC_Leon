@@ -52,7 +52,7 @@ class AuthController extends Controller
         [
             'name' => 'Claudio',
             'email' => 'c@c.com',
-            'password' => Hash::make('admin'),
+            'password' => Hash::make('12345'),
             'activo' => true,
             'rol'=> 'admin' 
         ]);

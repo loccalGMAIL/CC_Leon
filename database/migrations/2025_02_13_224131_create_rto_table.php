@@ -9,9 +9,9 @@ return new class extends Migration
     public function up()
     {
         Schema::create('rto', function (Blueprint $table) {
-            $table->increments('idRto');
-            $table->integer('idProveedor')->unsigned();
-            $table->integer('idCamion')->unsigned();
+            $table->id();
+            $table->foreignId('proveedores_id')->constrained('proveedores');
+            $table->foreignId('camiones_id')->constrained('camiones');
             $table->string('nroFacturaRto', 50);
             $table->date('fechaIngresoRto');
             $table->decimal('TC_RtoTeorico', 10, 2);
@@ -22,11 +22,7 @@ return new class extends Migration
             $table->softDeletes();
         });
 
-        Schema::table('rto', function (Blueprint $table) {
-            $table->foreign('idProveedor')->references('idProveedor')->on('proveedores');
-            $table->foreign('idCamion')->references('idCamion')->on('camiones');
-        });
-    }
+   }
 
     public function down()
     {

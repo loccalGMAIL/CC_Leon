@@ -9,16 +9,13 @@ return new class extends Migration
     public function up()
     {
         Schema::create('observaciones_rto', function (Blueprint $table) {
-            $table->increments('idObservacionesRto');
-            $table->integer('idRto')->unsigned();
+            $table->id();
+            $table->foreignId('Rto_id')->constrained('rto');
             $table->text('descripcionObservacionesRto');
             $table->timestamps();
             $table->softDeletes();
         });
 
-        Schema::table('observaciones_rto', function (Blueprint $table) {
-            $table->foreign('idRto')->references('idRto')->on('rto');
-        });
     }
 
     public function down()

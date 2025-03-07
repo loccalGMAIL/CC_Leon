@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Camion;
 use App\Models\Proveedor;
 use Illuminate\Http\Request;
 
@@ -19,7 +20,9 @@ class Proveedores extends Controller
 
     public function indexCamiones(){
         $titulo = 'Camiones';
-        return view('modules.proveedores.camiones.index');
+        $items = Camion::with('proveedor')->get();
+        $proveedores = Proveedor::all();
+        return view('modules.proveedores.camiones.index', compact('titulo', 'items', 'proveedores'));
     }
 
     /**
@@ -29,6 +32,12 @@ class Proveedores extends Controller
     {
         $titulo = 'Nuevo Proveedor';
         return view('modules.proveedores.create', compact('titulo'));
+    }
+
+    public function createCamiones(){
+        $titulo = 'Nuevo Camion';
+        $proveedores = Proveedor::all();
+        return view('modules.proveedores.camiones.create', compact('titulo', 'proveedores'));
     }
 
     /**
@@ -48,6 +57,14 @@ class Proveedores extends Controller
         return redirect()->route('proveedores');
     }
 
+    public function storeCamiones(Request $request){
+        $camion = new Camion();
+        $camion->patente = $request->patente;
+        $camion->proveedores_id = $request->proveedor_id;
+        $camion->save();
+        return redirect()->route('proveedores.camiones');
+    }
+
     /**
      * Display the specified resource.
      */
@@ -65,7 +82,13 @@ class Proveedores extends Controller
         $item = Proveedor::find($id);
         return view('modules.proveedores.edit', compact('titulo', 'item'));
     }
-
+    
+    public function editCamiones(string $id){
+        $titulo = 'Editar Camion';
+        $item = Camion::find($id);
+        $proveedores = Proveedor::all();
+        return view('modules.proveedores.camiones.edit', compact('titulo', 'item', 'proveedores'));
+    }
     /**
      * Update the specified resource in storage.
      */
@@ -81,6 +104,14 @@ class Proveedores extends Controller
         $proveedor->direccionProveedor = $request->direccionProveedor;
         $proveedor->save();
         return redirect()->route('proveedores');
+    }
+
+    public function updateCamiones(Request $request, string $id){
+        $camion = Camion::find($id);
+        $camion->patente = $request->patente;
+        $camion->proveedores_id = $request->proveedor_id;
+        $camion->save();
+        return redirect()->route('proveedores.camiones');
     }
 
     /**

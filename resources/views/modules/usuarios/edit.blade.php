@@ -29,8 +29,8 @@
                 <label for="rol">Rol de Usuario</label>
                 <select name="rol" id="rol" class="form-control">
                   <option value=""></option>
-                  <option value="admin">Administrador</option>
-                  <option value="usuario">Usuario</option>
+                  <option value="admin" {{ $item->rol == 'admin' ? 'selected' : '' }}>Administrador</option>
+                  <option value="usuario" {{ $item->rol == 'usuario' ? 'selected' : '' }}>Usuario</option>
                 </select>
                 <button class="btn btn-primary mt-3">Guardar</button>
                 <a href="{{route('usuarios')}}" class="btn btn-info mt-3">Cancelar</a>

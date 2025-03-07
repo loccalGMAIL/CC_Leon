@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('camiones', function (Blueprint $table) {
             $table->id();
-            $table->string('patente', 10)->unique();
+            $table->string('patente', 10)->nullable();
             $table->foreignId('proveedores_id')->constrained('proveedores');
             $table->timestamps();
         });

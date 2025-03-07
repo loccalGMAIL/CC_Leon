@@ -49,6 +49,10 @@ Route::prefix('proveedores')->middleware('auth')->group(function(){
     Route::put('/update/{id}',[Proveedores::class, 'update'])->name('proveedores.update');
 
     Route::get('/camiones',[Proveedores::class, 'indexCamiones'])->name('proveedores.camiones');
+    Route::get('/camiones/create',[Proveedores::class, 'createCamiones'])->name('proveedores.camiones.create');
+    Route::post('/camiones/store',[Proveedores::class, 'storeCamiones'])->name('proveedores.camiones.store');
+    Route::get('/camiones/edit/{id}',[Proveedores::class, 'editCamiones'])->name('proveedores.camiones.edit');
+    Route::put('/camiones/update/{id}',[Proveedores::class, 'updateCamiones'])->name('proveedores.camiones.update');
 });
 
 Route::prefix('informes')->middleware('auth')->group(function(){

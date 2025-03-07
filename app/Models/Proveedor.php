@@ -21,4 +21,8 @@ class Proveedor extends Model
     public $timestamps = true;
     protected $softDelete = true;
     
+    public function camiones()
+{
+    return $this->hasMany(Camion::class, 'proveedores_id', 'id');
+}
 }

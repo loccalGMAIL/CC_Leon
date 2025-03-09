@@ -1,0 +1,26 @@
+/* Personalización de datatables */
+.datatable {
+    font-size: 0.85rem !important;
+  }
+  
+  .datatable thead th {
+    font-size: 0.85rem !important;
+    font-weight: 600;
+    padding: 0.5rem !important;
+  }
+  
+  .datatable tbody td {
+    font-size: 0.85rem !important;
+    padding: 0.5rem !important;
+  }
+  
+  /* Reducir espaciado vertical */
+  .datatable tr {
+    line-height: 1.2;
+  }
+  
+  /* Reducir el tamaño de los botones de acción */
+  .datatable .btn-sm {
+    padding: 0.25rem 0.4rem;
+    font-size: 0.75rem;
+  }

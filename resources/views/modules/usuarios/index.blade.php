@@ -20,7 +20,7 @@
         <h5 class="card-title">Administrar Usuarios</h5>
         <p class="card-text">En esta sección podrá administrar las cuentas y roles de usuarios.</p>
 
-        <a href="{{route('usuarios.create')}}" class="btn btn-primary mt-3">
+        <a href="{{route('usuarios.create')}}" class="btn btn-primary mt-3 mb-3">
           <i class="fa-solid fa-circle-plus"> </i> Agregar nuevo Usuario
         </a>
         <!-- Table with stripped rows -->

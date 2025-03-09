@@ -20,7 +20,7 @@
         <h5 class="card-title">Administrar los camiones</h5>
         <p class="card-text">En esta sección podrá administrar los camiones de los diferentes proveedores.</p>
 
-        <a href="{{route('proveedores.camiones.create')}}" class="btn btn-primary mt-3">
+        <a href="{{route('proveedores.camiones.create')}}" class="btn btn-primary mt-3 mb-3">
           <i class="fa-solid fa-circle-plus"> </i> Agregar nuevo camión
         </a>
         <!-- Table with stripped rows -->

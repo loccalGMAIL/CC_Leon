@@ -1,14 +1,321 @@
 @extends('layouts.main')
 
-<main id="main" class="main">
+@section('titulo', $titulo)
+
+@section('contenido')
+
+  <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Remitos</h1>
-      
+    <h1>Remitos</h1>
+
     </div><!-- End Page Title -->
 
-    <section class="section dashboard">
+    <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
 
+      <div class="card">
+        <div class="card-body">
+        <h5 class="card-title">Listado de Remitos</h5>
+        <p class="card-text">En esta sección podrá administrar los remitos de los envios.</p>
+
+        <a href="#" class="btn btn-primary mt-3 mb-3" data-bs-toggle="modal" data-bs-target="#agregarRemitoModal">
+          <i class="fa-solid fa-circle-plus"></i> Agregar nuevo remito
+        </a>
+        <!-- Table with stripped rows -->
+        <table class="table datatable">
+          <thead>
+          <tr>
+            <th class="text-center">Nro Remito</th>
+            <th class="text-center">Proveedor</th>
+            <th class="text-center">Nro Factura</th>
+            <th class="text-center">Observ.</th>
+            <th class="text-center">Reclamos</th>
+            <th class="text-center">Ingreso</th>
+            <th class="text-center">Actualiación</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+          </thead>
+          <tbody>
+          @foreach ($items as $item)
+        <tr class="text-center">
+        <td>
+          {{ str_pad($item->proveedores_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($item->camiones_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($item->id, 6, '0', STR_PAD_LEFT) }}
+        </td>
+        <td>{{ $item->proveedor->nombreProveedor ?? 'Sin proveedor' }}</td>
+        <td>{{$item->nroFacturaRto}}</td>
+        <td>{{ $item->observaciones_count ?? 0 }}</td>
+        <td>{{ $item->reclamos_count ?? 0 }}</td>
+        <td>{{ \Carbon\Carbon::parse($item->fechaIngresoRto)->format('d/m/Y') }}</td>
+        <td>{{ \Carbon\Carbon::parse($item->updated_at)->format('d/m/Y H:i') }}</td>
+        <td>
+          <a href="#" class="badge bg-success d-block mb-1"><span>Editar</span></a>
+          <a href="#" class="badge bg-secondary d-block mb-1"><span>Observaciones</span></a>
+          <a href="#" class="badge bg-danger d-block"><span>Reclamos</span></a>
+        </td>
+        </tr>
+      @endforeach
+        </table>
+        <!-- End Table with stripped rows -->
+
+        </div>
+      </div>
+
+      </div>
+    </div>
+
+    <!-- Modal para agregar remito -->
+    <div class="modal fade" id="agregarRemitoModal" tabindex="-1" aria-labelledby="agregarRemitoModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="agregarRemitoModalLabel">Agregar Nuevo Remito</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        <form id="nuevoRemitoForm" method="POST" action="{{ route('remitos.store') }}">
+          @csrf
+          <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="fechaIngresoRto" class="form-label">Fecha</label>
+            <input type="date" class="form-control" id="fechaIngresoRto" name="fechaIngresoRto" required
+            value="{{ date('Y-m-d') }}">
+          </div>
+          <div class="col-md-6">
+            <label for="nroFacturaRto" class="form-label">Nro. de Factura</label>
+            <input type="text" class="form-control" id="nroFacturaRto" name="nroFacturaRto" required>
+          </div>
+          </div>
+
+          <div class="row mb-3">
+          <div class="col-md-12">
+            <div class="d-flex">
+            <div class="flex-grow-1">
+              <label for="idProveedor" class="form-label">Proveedor</label>
+              <select class="form-select" id="idProveedor" name="idProveedor" required>
+              <option value="">Seleccionar proveedor</option>
+              @foreach($proveedores as $proveedor)
+          <option value="{{ $proveedor->id }}">
+          {{ $proveedor->razonSocialProveedor }} ({{ $proveedor->nombreProveedor }}
+          {{-- {{ $proveedor->apellidoProveedor }} --}})
+          </option>
+        @endforeach
+              </select>
+            </div>
+            <div class="ms-2 d-flex align-items-end">
+              <button type="button" class="btn btn-success" data-bs-toggle="modal"
+              data-bs-target="#agregarProveedorModal">
+              <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+            </div>
+          </div>
+          </div>
+
+          <div class="row mb-3">
+          <div class="col-md-12">
+            <label for="idCamion" class="form-label">Camión</label>
+            <select class="form-select" id="idCamion" name="idCamion" required disabled>
+            <option value="">Primero seleccione un proveedor</option>
+            </select>
+            <div id="camionMessage" class="text-danger mt-2 d-none">
+            Este proveedor no tiene camiones asignados. Por favor, agregue un camión primero.
+            </div>
+          </div>
+          </div>
+
+        </form>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" form="nuevoRemitoForm" class="btn btn-primary">Crear</button>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- Modal para agregar proveedor -->
+    <div class="modal fade" id="agregarProveedorModal" tabindex="-1" aria-labelledby="agregarProveedorModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="agregarProveedorModalLabel">Agregar Nuevo Proveedor</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        <form id="nuevoProveedorForm" method="POST" action="{{ route('proveedores.store') }}">
+          @csrf
+          <div class="mb-3">
+          <label for="nombreProveedor" class="form-label">Nombre del proveedor</label>
+          <input type="text" class="form-control" id="nombreProveedor" name="nombreProveedor" required>
+          </div>
+          <div class="mb-3">
+          <label for="dniProveedor" class="form-label">DNI</label>
+          <input type="text" class="form-control" id="dniProveedor" name="dniProveedor" required>
+          </div>
+          <div class="mb-3">
+          <label for="razonSocialProveedor" class="form-label">Razón Social</label>
+          <input type="text" class="form-control" id="razonSocialProveedor" name="razonSocialProveedor" required>
+          </div>
+          <div class="mb-3">
+          <label for="cuitProveedor" class="form-label">CUIT</label>
+          <input type="text" class="form-control" id="cuitProveedor" name="cuitProveedor" required>
+          </div>
+          <div class="mb-3">
+          <label for="telefonoProveedor" class="form-label">Teléfono</label>
+          <input type="text" class="form-control" id="telefonoProveedor" name="telefonoProveedor" required>
+          </div>
+          <div class="mb-3">
+          <label for="mailProveedor" class="form-label">Email</label>
+          <input type="email" class="form-control" id="mailProveedor" name="mailProveedor" required>
+          </div>
+          <div class="mb-3">
+          <label for="direccionProveedor" class="form-label">Dirección</label>
+          <input type="text" class="form-control" id="direccionProveedor" name="direccionProveedor" required>
+          </div>
+          <input type="hidden" name="estadoProveedor" value="Activo">
+        </form>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" form="nuevoProveedorForm" class="btn btn-primary">Guardar</button>
+        </div>
+      </div>
+      </div>
+    </div>
     </section>
 
   </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    // Referencias a elementos del DOM
+    const proveedorSelect = document.getElementById('idProveedor');
+    const camionSelect = document.getElementById('idCamion');
+    const camionMessage = document.getElementById('camionMessage');
+
+    // Función para cargar camiones según el proveedor seleccionado
+    proveedorSelect.addEventListener('change', function () {
+      const proveedorId = this.value;
+      console.log('Proveedor seleccionado:', proveedorId);
+
+      if (proveedorId) {
+      // Habilitar el select de camiones
+      camionSelect.disabled = false;
+
+      // Limpiar opciones actuales
+      camionSelect.innerHTML = '<option value="">Cargando camiones...</option>';
+
+      // La URL correcta con los prefijos de grupo de rutas
+      const url = `/proveedores/${proveedorId}/camiones`;
+      console.log('Consultando URL:', url);
+
+      fetch(url)
+        .then(response => {
+        console.log('Respuesta status:', response.status);
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
+        return response.json();
+        })
+        .then(data => {
+        console.log('Datos recibidos:', data);
+        camionSelect.innerHTML = '';
+
+        if (data.length > 0) {
+          camionSelect.innerHTML = '<option value="">Seleccione un camión</option>';
+
+          data.forEach(camion => {
+          console.log('Camión:', camion);
+          const option = document.createElement('option');
+          option.value = camion.id;
+          const patenteTexto = camion.patente ? camion.patente : 'Sin patente';
+          option.textContent = `${camion.id} - ${patenteTexto}`;
+          camionSelect.appendChild(option);
+          });
+
+          camionMessage.classList.add('d-none');
+        } else {
+          camionSelect.innerHTML = '<option value="">No hay camiones disponibles</option>';
+          camionSelect.disabled = true;
+          camionMessage.classList.remove('d-none');
+        }
+        })
+        .catch(error => {
+        console.error('Error detallado:', error);
+        camionSelect.innerHTML = `<option value="">Error: ${error.message}</option>`;
+        });
+      } else {
+      // Si no hay proveedor seleccionado
+      camionSelect.disabled = true;
+      camionSelect.innerHTML = '<option value="">Primero seleccione un proveedor</option>';
+      camionMessage.classList.add('d-none');
+      }
+    });
+
+    // Manejar cierre de modal de proveedor y actualizar lista
+    const agregarProveedorModal = document.getElementById('agregarProveedorModal');
+    agregarProveedorModal.addEventListener('hidden.bs.modal', function () {
+      // Aquí podríamos recargar la lista de proveedores si se agregó uno nuevo
+    });
+
+    // Envío de formulario de proveedor con AJAX
+    const nuevoProveedorForm = document.getElementById('nuevoProveedorForm');
+    nuevoProveedorForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      // Crear FormData con los datos del formulario
+      const formData = new FormData(this);
+
+      // Enviar datos con fetch
+      fetch(this.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      }
+      })
+      .then(response => {
+        if (!response.ok) {
+        throw new Error('Error en la respuesta del servidor');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+        // Cerrar modal
+        const modal = bootstrap.Modal.getInstance(agregarProveedorModal);
+        modal.hide();
+
+        // Agregar el nuevo proveedor al select
+        const option = document.createElement('option');
+        option.value = data.proveedor.id;
+        option.textContent = `${data.proveedor.razonSocialProveedor} (${data.proveedor.nombreProveedor})`;
+        proveedorSelect.appendChild(option);
+
+        // Seleccionar el nuevo proveedor
+        proveedorSelect.value = data.proveedor.id;
+
+        // Disparar el evento change para cargar los camiones
+        proveedorSelect.dispatchEvent(new Event('change'));
+
+        // Mostrar notificación de éxito
+        alert('Proveedor agregado correctamente');
+        } else {
+        // Mostrar errores
+        alert('Error al agregar proveedor: ' + (data.message || 'Error desconocido'));
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error en el servidor: ' + error.message);
+      });
+    });
+    });
+  </script>
+
+@endsection

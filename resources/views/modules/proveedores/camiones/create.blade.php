@@ -28,7 +28,7 @@
             <!-- Segunda columna -->
             <div class="col-md-6">
             <label for="proveedor_id">Proveedor</label>
-            <select name="proveedor_id" id="proveedor_id" class="form-control">
+            <select name="proveedor_id" id="proveedor_id" class="form-control" required>
               <option value=""></option>
               @foreach ($proveedores as $proveedor)
               <option value="{{ $proveedor->id }}">{{ $proveedor->nombreProveedor }}</option>

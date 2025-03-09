@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Observacion;
 
 class Observaciones extends Controller
 {
@@ -11,7 +12,9 @@ class Observaciones extends Controller
      */
     public function index()
     {
-        return view('modules.rto.observaciones.index');
+        $titulo = 'Observaciones';
+        $items = Observacion::all();
+        return view('modules.rto.observaciones.index', compact('titulo', 'items'));
     }
 
     /**

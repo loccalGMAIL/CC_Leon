@@ -121,4 +121,12 @@ class Proveedores extends Controller
     {
         //
     }
+
+    public function getCamiones($id)
+    {
+        
+        $camiones = Camion::where('proveedores_id', $id)->get();
+        
+        return response()->json($camiones);
+    }
 }

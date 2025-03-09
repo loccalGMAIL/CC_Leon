@@ -12,6 +12,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('Rto_id')->constrained('rto');
             $table->text('descripcionReclamoRto');
+            $table->enum('estadoReclamoRto', ['pendiente', 'resuelto']);
+            $table->text('resolucionReclamoRto')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

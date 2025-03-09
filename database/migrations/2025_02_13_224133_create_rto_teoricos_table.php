@@ -14,6 +14,7 @@ return new class extends Migration
             $table->foreignId('elementoRto_id')->constrained('elementos_rto');
             $table->decimal('valorPesosRtoTeorico', 10, 2)->nullable();
             $table->decimal('valorDolaresRtoTeorico', 10, 2)->nullable();
+            $table->decimal('TC_RtoTeorico', 10, 2)->nullable();
             $table->decimal('subTotalRtoTeorico', 10, 2);
             $table->timestamps();
             $table->softDeletes();

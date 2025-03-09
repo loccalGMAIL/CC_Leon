@@ -13,11 +13,9 @@ return new class extends Migration
             $table->foreignId('proveedores_id')->constrained('proveedores');
             $table->foreignId('camiones_id')->constrained('camiones');
             $table->string('nroFacturaRto', 50);
-            $table->date('fechaIngresoRto');
-            $table->decimal('TC_RtoTeorico', 10, 2);
-            $table->decimal('TC_RtoFinal', 10, 2);
-            $table->decimal('totalTempRto', 10, 2);
-            $table->decimal('totalFinalRto', 10, 2);
+            $table->date('fechaIngresoRto');            
+            $table->decimal('totalTempRto', 10, 2)->nullable();
+            $table->decimal('totalFinalRto', 10, 2)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

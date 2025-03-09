@@ -11,7 +11,9 @@ class Reclamos extends Controller
      */
     public function index()
     {
-        return view('modules.rto.reclamos.index');
+        $titulo = 'Reclamos';
+        $items = \App\Models\Reclamo::all();
+        return view('modules.rto.reclamos.index', compact('titulo', 'items'));
     }
 
     /**

@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('rto_finales', function (Blueprint $table) {
             $table->id();
             $table->foreignId('RtoTeorico_id')->constrained('rto_teoricos');
+            $table->decimal('TC_RtoFinal', 10, 2)->nullable();
             $table->decimal('subTotalRtoFinal', 10, 2);
             $table->timestamps();
             $table->softDeletes();

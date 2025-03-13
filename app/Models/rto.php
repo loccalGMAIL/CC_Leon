@@ -19,7 +19,7 @@ class rto extends Model
 
     public function proveedor()
     {
-        return $this->belongsTo(Proveedor::class, 'id');
+        return $this->belongsTo(Proveedor::class, 'proveedores_id');
     }
 
     public function camion()

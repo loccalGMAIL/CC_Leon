@@ -15,11 +15,13 @@
 
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
 
   <!-- Vendor CSS Files -->
   <link href="{{asset('NiceAdmin/assets/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
-  <link href="{{asset('NiceAdmin/assets/vendor/bootstrap-icons/bootstrap-icons.css' )}}" rel='stylesheet'>
+  <link href="{{asset('NiceAdmin/assets/vendor/bootstrap-icons/bootstrap-icons.css')}}" rel='stylesheet'>
   <link href="{{asset('NiceAdmin/assets/vendor/boxicons/css/boxicons.min.css')}}" rel="stylesheet">
   <link href="{{asset('NiceAdmin/assets/vendor/quill/quill.snow.css')}}" rel="stylesheet">
   <link href="{{asset('NiceAdmin/assets/vendor/quill/quill.bubble.css')}}" rel="stylesheet">
@@ -32,27 +34,37 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
   <link href="{{ asset('NiceAdmin/assets/css/custom.css') }}" rel="stylesheet">
+
+
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+
+  <!-- En la sección head de tu layout -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
+    rel="stylesheet" />
+
 </head>
 
 <body>
 
   <!-- ======= Header ======= -->
   @include('shared.header')
-<!-- End Header -->
+  <!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   @include('shared.sidebar')
- <!-- End Sidebar-->
+  <!-- End Sidebar-->
 
- @yield('contenido')
+  @yield('contenido')
 
   </div><!-- End #main -->
 
   <!-- ======= Footer ======= -->
   @include('shared.footer')
- <!-- End #main -->
+  <!-- End #main -->
 
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
   <script src="{{asset('NiceAdmin/assets/vendor/apexcharts/apexcharts.min.js')}}"></script>
@@ -66,6 +78,9 @@
 
   <!-- Template Main JS File -->
   <script src="{{asset('NiceAdmin/assets/js/main.js')}}"></script>
+
+  <!-- Antes del cierre del body, después de jQuery -->
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 </body>
 

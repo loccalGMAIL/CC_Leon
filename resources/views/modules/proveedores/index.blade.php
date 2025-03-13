@@ -56,7 +56,6 @@
         </div>' !!}</td>
           <td>
           <a href="{{route('proveedores.edit', $item->id)}}" class="btn btn-warning bt-sm"><i class="fa-solid fa-user-pen"></i></a>
-          <a href="#" class="btn btn-danger bt-sm"><i class="fa-solid fa-user-gear"></i></a>
           </td>
           </tr>
       @endforeach

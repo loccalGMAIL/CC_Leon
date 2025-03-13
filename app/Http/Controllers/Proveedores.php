@@ -53,7 +53,19 @@ class Proveedores extends Controller
         $proveedor->telefonoProveedor = $request->telefonoProveedor;
         $proveedor->mailProveedor = $request->mailProveedor;
         $proveedor->direccionProveedor = $request->direccionProveedor;
+        $proveedor->estadoProveedor = '1'; // Asegura que se establece como activo
         $proveedor->save();
+        
+        // Comprobar si la solicitud es AJAX
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Proveedor agregado correctamente',
+                'proveedor' => $proveedor
+            ]);
+        }
+        
+        // Para solicitudes normales, redirigir
         return redirect()->route('proveedores');
     }
 

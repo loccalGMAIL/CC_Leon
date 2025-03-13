@@ -50,7 +50,7 @@
         <td>{{ \Carbon\Carbon::parse($item->fechaIngresoRto)->format('d/m/Y') }}</td>
         <td>{{ \Carbon\Carbon::parse($item->updated_at)->format('d/m/Y H:i') }}</td>
         <td>
-          <a href="#" class="badge bg-success d-block mb-1"><span>Editar</span></a>
+          <a href="{{route('remitos.edit',$item->id)}}" class="badge bg-success d-block mb-1"><span>Editar</span></a>
           <a href="#" class="badge bg-secondary d-block mb-1"><span>Observaciones</span></a>
           <a href="#" class="badge bg-danger d-block"><span>Reclamos</span></a>
         </td>
@@ -99,7 +99,6 @@
               @foreach($proveedores as $proveedor)
           <option value="{{ $proveedor->id }}">
           {{ $proveedor->razonSocialProveedor }} ({{ $proveedor->nombreProveedor }}
-          {{-- {{ $proveedor->apellidoProveedor }} --}})
           </option>
         @endforeach
               </select>
@@ -154,7 +153,7 @@
           </div>
           <div class="mb-3">
           <label for="dniProveedor" class="form-label">DNI</label>
-          <input type="text" class="form-control" id="dniProveedor" name="dniProveedor" required>
+          <input type="text" class="form-control" id="dniProveedor" name="dniProveedor" >
           </div>
           <div class="mb-3">
           <label for="razonSocialProveedor" class="form-label">Razón Social</label>
@@ -166,17 +165,17 @@
           </div>
           <div class="mb-3">
           <label for="telefonoProveedor" class="form-label">Teléfono</label>
-          <input type="text" class="form-control" id="telefonoProveedor" name="telefonoProveedor" required>
+          <input type="text" class="form-control" id="telefonoProveedor" name="telefonoProveedor" >
           </div>
           <div class="mb-3">
           <label for="mailProveedor" class="form-label">Email</label>
-          <input type="email" class="form-control" id="mailProveedor" name="mailProveedor" required>
+          <input type="email" class="form-control" id="mailProveedor" name="mailProveedor" >
           </div>
           <div class="mb-3">
           <label for="direccionProveedor" class="form-label">Dirección</label>
-          <input type="text" class="form-control" id="direccionProveedor" name="direccionProveedor" required>
+          <input type="text" class="form-control" id="direccionProveedor" name="direccionProveedor" >
           </div>
-          <input type="hidden" name="estadoProveedor" value="Activo">
+
         </form>
         </div>
         <div class="modal-footer">

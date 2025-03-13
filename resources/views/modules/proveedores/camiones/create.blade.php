@@ -31,7 +31,7 @@
             <select name="proveedor_id" id="proveedor_id" class="form-control" required>
               <option value=""></option>
               @foreach ($proveedores as $proveedor)
-              <option value="{{ $proveedor->id }}">{{ $proveedor->nombreProveedor }}</option>
+              <option value="{{ $proveedor->id }}">{{ $proveedor->razonSocialProveedor }} ({{ $proveedor->nombreProveedor }})</option>
               @endforeach
             </select>
 

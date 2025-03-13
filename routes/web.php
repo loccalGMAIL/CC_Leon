@@ -3,13 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Dashboard;
+use App\Http\Controllers\ElementosRtoController;
 use App\Http\Controllers\Observaciones;
 use App\Http\Controllers\Reclamos;
 use App\Http\Controllers\RtoController;
 use App\Http\Controllers\Usuarios;
 use App\Http\Controllers\Proveedores;
 use App\Http\Controllers\Informes;
-use App\Models\Proveedor;
+use App\Http\Controllers\RtoDetalleController;
 
 // Crear usuario admin (Solo usar una vez)
 // Route::get('/crear-admin',[AuthController::class, 'crearAdmin'])->name('crear-admin');
@@ -33,6 +34,12 @@ Route::prefix('usuarios')->middleware('auth')->group(function () {
 Route::prefix('remitos')->middleware('auth')->group(function () {
     Route::get('/', [RtoController::class, 'index'])->name('remitos');
     Route::post('/store', [RtoController::class, 'store'])->name('remitos.store');
+    Route::get('/edit/{id}', [RtoController::class, 'edit'])->name('remitos.edit');
+    Route::post('/storeElementoRto', [ElementosRtoController::class, 'storeElementoRto'])->name('storeElementoRto');
+    Route::post('/storeRtoDetalle', [RtoDetalleController::class, 'store'])->name('storeRtoDetalle.store');
+    Route::post('actualizarCampo', [RtoDetalleController::class, 'actualizarCampo'])->name('actualizarCampo');
+    Route::get('obtenerValor/{id}/{field}', [RtoDetalleController::class, 'obtenerValor'])->name('obtenerValor');
+    Route::post('/deleteRtoDetalle/{id}', [RtoDetalleController::class, 'delete'])->name('deleteRtoDetalle');
 });
 
 route::prefix('reclamos')->middleware('auth')->group(function () {
@@ -49,7 +56,7 @@ Route::prefix('proveedores')->middleware('auth')->group(function () {
     Route::post('/store', [Proveedores::class, 'store'])->name('proveedores.store');
     Route::get('/edit/{id}', [Proveedores::class, 'edit'])->name('proveedores.edit');
     Route::put('/update/{id}', [Proveedores::class, 'update'])->name('proveedores.update');
-    
+
     Route::get('/camiones', [Proveedores::class, 'indexCamiones'])->name('proveedores.camiones');
     Route::get('/camiones/create', [Proveedores::class, 'createCamiones'])->name('proveedores.camiones.create');
     Route::post('/camiones/store', [Proveedores::class, 'storeCamiones'])->name('proveedores.camiones.store');

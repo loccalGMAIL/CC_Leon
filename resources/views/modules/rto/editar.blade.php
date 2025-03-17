@@ -131,9 +131,11 @@
                                                                             {{ number_format($detalle->TC_RtoTeorico, 2, ',', '.') }}
                                                                         </td>
                                                                         <td class="text-end">{{ number_format($subtotalTeorico, 2, ',', '.') }}</td>
-                                                                        <td class="text-end columna-final">{{ number_format($tcFinal, 2, ',', '.') }}</td>
-                                                                        <td class="text-end columna-final">{{ number_format($subtotalFinal, 2, ',', '.') }}
+                                                                        <td class="text-end columna-final editable-cell" data-type="tc" data-id="{{ $detalle->id }}" data-field="TC_RtoFinal">
+                                                                            {{ number_format($tcFinal, 2, ',', '.') }}
                                                                         </td>
+                                                                        <td class="ext-end columna-final">{{ number_format($subtotalFinal, 2, ',', '.') }}
+
                                                                         <td>
                                                                             <a href="#" class="badge bg-danger eliminar-elemento"
                                                                                 data-id="{{ $detalle->id }}"><span>Eliminar</span></a>
@@ -148,8 +150,7 @@
                                         <td></td>
                                         <td class="fw-bold text-end">$ {{ number_format($totalTeorico, 2, ',', '.') }}</td>
                                         <td class="columna-final"></td>
-                                        <td class="fw-bold text-end columna-final">$
-                                            {{ number_format($totalFinal, 2, ',', '.') }}</td>
+                                        <td class="fw-bold text-end columna-final editable-cell" data-type="total" data-id="{{ $items->id }}" data-field="totalFinalRto">$ {{ number_format($totalFinal, 2, ',', '.') }}</td>
                                     </tr>
                                     <!-- Fila de diferencia -->
                                     <tr class="table-info">

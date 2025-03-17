@@ -7,6 +7,7 @@ use App\Models\ElementoRto;
 use App\Models\Rto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Response;
 
 class RtoDetalleController extends Controller
 {
@@ -51,7 +52,7 @@ class RtoDetalleController extends Controller
                 'valorDolaresRtoTeorico' => $request->valorDolaresRtoTeorico,
                 'valorPesosRtoTeorico' => $request->valorPesosRtoTeorico,
                 'TC_RtoTeorico' => $request->TC_RtoTeorico,
-                'subTotalRtoTeorico' => $subtotal,
+                //'subTotalRtoTeorico' => $subtotal,
             ]);
     
             // Actualizar el total en la tabla de RTO
@@ -95,11 +96,29 @@ class RtoDetalleController extends Controller
             $value = $request->input('value');
 
             // Validar datos
-            if (!in_array($field, ['valorDolaresRtoTeorico', 'valorPesosRtoTeorico', 'TC_RtoTeorico'])) {
+            if (!in_array($field, ['valorDolaresRtoTeorico', 'valorPesosRtoTeorico', 'TC_RtoTeorico', 'totalFinalRto'])) {
                 return response()->json(['success' => false, 'message' => 'Campo no válido']);
             }
 
-            // Buscar el registro
+            if ($field === 'totalFinalRto') {
+                // Si es el total final, actualizar directamente en la tabla Rto
+                $rto = Rto::findOrFail($id);
+                $rto->totalFinalRto = $value;
+                $rto->save();
+
+                $totalTeorico = $rto->totalTempRto;
+                $totalFinal = $value;
+                $diferencia = $totalFinal - $totalTeorico;
+
+                return response()->json([
+                    'success' => true,
+                    'totalTeorico' => $totalTeorico,
+                    'totalFinal' => $totalFinal,
+                    'diferencia' => $diferencia
+                ]);
+            }
+
+            // Si no es el total final, continuar con la lógica existente para otros campos
             $detalle = RtoDetalle::findOrFail($id);
 
             // Actualizar el campo

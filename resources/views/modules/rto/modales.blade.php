@@ -53,7 +53,7 @@
                 </div>
             </div>
 
-            <!-- Modal para agregar/editar elemento del RTO -->
+            <!-- Modal para agregar elemento del RTO -->
             <div class="modal fade" id="agregarElementoModal" tabindex="-1" aria-labelledby="agregarElementoModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog">

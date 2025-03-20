@@ -83,10 +83,14 @@
                             </div>
 
 
-                            <a href="#" class="btn btn-primary mt-3 mb-3" data-bs-toggle="modal"
-                                data-bs-target="#agregarElementoModal">
-                                <i class="fa-solid fa-circle-plus"></i> Agregar nuevo
-                            </a>
+                            <div class="d-flex gap-2 mt-3 mb-3">
+                                <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#agregarElementoModal">
+                                    <i class="fa-solid fa-circle-plus"></i> Agregar nuevo
+                                </a>
+                                <button type="button" id="toggleFinalColumns" class="btn btn-primary">
+                                    <i class="fa-solid fa-eye"></i> Mostrar Columnas Finales
+                                </button>
+                            </div>
 
                             <!-- Table with stripped rows -->
                             @include('modules.rto.table_edit')
@@ -110,11 +114,11 @@
             cursor: pointer;
             position: relative;
         }
-
+    
         .editable-cell:hover {
             background-color: #f5f5f5;
         }
-
+    
         .editable-cell:hover::after {
             content: '✎';
             position: absolute;
@@ -122,12 +126,12 @@
             color: #6c757d;
             font-size: 12px;
         }
-
+    
         .editable-cell.editing {
             padding: 0 !important;
             background-color: #e8f4ff !important;
         }
-
+    
         .editable-cell input {
             width: 100%;
             height: 100%;
@@ -135,6 +139,34 @@
             padding: 0.375rem 0.75rem;
             text-align: right;
             outline: none;
+        }
+    
+        .columna-final {
+            background-color: #e2f0ff;
+        }
+    
+        .celda-desactivada {
+            background-color: #f0f0f0;
+            color: #999;
+            cursor: not-allowed;
+        }
+    
+        .toggle-column.active {
+            animation: highlight-column 1s ease;
+        }
+    
+        @keyframes highlight-column {
+            0% { background-color: #e2f0ff; }
+            50% { background-color: #c2e0ff; }
+            100% { background-color: #e2f0ff; }
+        }
+    
+        #toggleFinalColumns {
+            transition: all 0.3s ease;
+        }
+    
+        #toggleFinalColumns:hover {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
     </style>
 

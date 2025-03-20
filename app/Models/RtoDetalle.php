@@ -15,8 +15,6 @@ class RtoDetalle extends Model
         'valorPesosRtoTeorico',
         'TC_RtoTeorico',
         'subTotalRtoTeorico',
-        'valorDolaresRtoReal',
-        'valorPesosRtoReal',
         'TC_RtoReal',
         'subTotalRtoReal',
     ];

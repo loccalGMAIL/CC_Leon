@@ -2,12 +2,12 @@
     <thead>
         <tr>
             <th class="text-center">Elementos</th>
-            <th class="text-center">Dolares Teórico</th>
-            <th class="text-center">Pesos Teórico</th>
+            <th class="text-center">Dolares</th>
+            <th class="text-center">Pesos</th>
             <th class="text-center">T.C. Teórico</th>
             <th class="text-center">SubTotal Teórico</th>
-            <th class="text-center columna-final">T.C. Final</th>
-            <th class="text-center columna-final">SubTotal Final</th>
+            <th class="text-center columna-final toggle-column" style="display: none;">T.C. Final</th>
+            <th class="text-center columna-final toggle-column" style="display: none;">SubTotal Final</th>
             <th class="text-center">Acciones</th>
         </tr>
     </thead>
@@ -18,12 +18,12 @@
         @endphp
         @foreach ($detalles as $detalle)
                 @php
-                    $subtotalTeorico = $detalle->valorDolaresRtoTeorico * $detalle->TC_RtoTeorico;
+                    $subtotalTeorico = $detalle->subTotalRtoTeorico;
                     $totalTeorico += $subtotalTeorico;
 
                     // Obtenemos el valor final si existe
-                    $tcFinal = $detalle->rtoFinal->TC_RtoFinal ?? $detalle->TC_RtoTeorico;
-                    $subtotalFinal = $detalle->valorDolaresRtoTeorico * $tcFinal;
+                    $tcFinal = $detalle->TC_RtoReal ?? 0;
+                    $subtotalFinal = $detalle->subTotalRtoReal;
                     $totalFinal += $subtotalFinal;
                 @endphp
                 <tr class="text-center">
@@ -39,13 +39,17 @@
                     <td class="text-end editable-cell" data-type="tc" data-id="{{ $detalle->id }}" data-field="TC_RtoTeorico">
                         {{ number_format($detalle->TC_RtoTeorico, 2, ',', '.') }}
                     </td>
-                    <td class="text-end">{{ number_format($subtotalTeorico, 2, ',', '.') }}</td>
-                    <td class="text-end columna-final editable-cell" data-type="tc" data-id="{{ $detalle->id }}"
-                        data-field="TC_RtoFinal">
+                    <td class="text-end" data-type="peso" data-id="{{ $detalle->id }}" data-field="subTotalRtoTeorico">
+                        {{ number_format($subtotalTeorico, 2, ',', '.') }}
+                    </td>
+                    <td class="text-end columna-final toggle-column editable-cell" data-type="tc" data-id="{{ $detalle->id }}"
+                        data-field="TC_RtoReal" style="display: none;">
                         {{ number_format($tcFinal, 2, ',', '.') }}
                     </td>
-                    <td class="ext-end columna-final">{{ number_format($subtotalFinal, 2, ',', '.') }}
-
+                    <td class="text-end columna-final toggle-column" data-type="peso" data-id="{{ $detalle->id }}"
+                        data-field="subTotalRtoReal" style="display: none;">
+                        {{ number_format($subtotalFinal, 2, ',', '.') }}
+                    </td>
                     <td>
                         <a href="#" class="badge bg-danger eliminar-elemento"
                             data-id="{{ $detalle->id }}"><span>Eliminar</span></a>
@@ -59,9 +63,10 @@
             <td></td>
             <td></td>
             <td class="fw-bold text-end">$ {{ number_format($totalTeorico, 2, ',', '.') }}</td>
-            <td class="columna-final"></td>
-            <td class="fw-bold text-end columna-final editable-cell" data-type="total" data-id="{{ $items->id }}"
-                data-field="totalFinalRto">$ {{ number_format($totalFinal, 2, ',', '.') }}</td>
+            <td class="columna-final toggle-column" style="display: none;"></td>
+            <td class="fw-bold text-end columna-final toggle-column" data-type="total" data-id="{{ $items->id }}"
+                data-field="totalFinalRto" style="display: none;">$ {{ number_format($totalFinal, 2, ',', '.') }}</td>
+            <td></td>
         </tr>
         <!-- Fila de diferencia -->
         <tr class="table-info">
@@ -69,7 +74,9 @@
             <td colspan="2" class="fw-bold text-end">
                 $ {{ number_format($totalFinal - $totalTeorico, 2, ',', '.') }}
             </td>
-            <!-- resto de la fila -->
+            <td colspan="2"></td>
+            <td class="columna-final toggle-column" colspan="2" style="display: none;"></td>
+            <td></td>
         </tr>
     </tbody>
 </table>
@@ -87,9 +94,109 @@
 
     // Variables para la edición en línea
     let activeEditCell = null;
+    let columnasFinalesVisibles = false;
+
+    // Función para alternar la visibilidad de las columnas finales
+    function toggleFinalColumns() {
+        const toggleColumns = document.querySelectorAll('.toggle-column');
+        const toggleButton = document.getElementById('toggleFinalColumns');
+        
+        columnasFinalesVisibles = !columnasFinalesVisibles;
+        
+        toggleColumns.forEach(col => {
+            col.style.display = columnasFinalesVisibles ? '' : 'none';
+        });
+        
+        if (toggleButton) {
+            toggleButton.innerHTML = columnasFinalesVisibles 
+                ? '<i class="fa-solid fa-eye-slash"></i> Ocultar Columnas Finales'
+                : '<i class="fa-solid fa-eye"></i> Mostrar Columnas Finales';
+        }
+        
+        // Si estamos ocultando columnas y hay una celda en edición en alguna columna final, cerrar la edición
+        if (!columnasFinalesVisibles && activeEditCell && activeEditCell.classList.contains('columna-final')) {
+            finishEditing(false);
+        }
+    }
+
+    // Función para verificar y aplicar restricciones de edición a las celdas
+    function aplicarRestriccionesEdicion() {
+        // Recorrer todas las filas de la tabla (excluyendo encabezados y totales)
+        const filas = document.querySelectorAll('.remitos-datatable tbody tr:not(.table-primary):not(.table-info)');
+        
+        filas.forEach(fila => {
+            // Obtener celdas relevantes de la fila
+            const celdaDolares = fila.querySelector('td[data-field="valorDolaresRtoTeorico"]');
+            const celdaPesos = fila.querySelector('td[data-field="valorPesosRtoTeorico"]');
+            const celdaTCTeorico = fila.querySelector('td[data-field="TC_RtoTeorico"]');
+            const celdaTCFinal = fila.querySelector('td[data-field="TC_RtoReal"]');
+            
+            if (!celdaDolares || !celdaPesos || !celdaTCTeorico || !celdaTCFinal) return;
+            
+            // Obtener valores numéricos
+            const valorDolares = parseFloat(celdaDolares.textContent.replace(/\./g, '').replace(',', '.')) || 0;
+            const valorPesos = parseFloat(celdaPesos.textContent.replace(/\./g, '').replace(',', '.')) || 0;
+            
+            // Aplicar restricciones
+            if (valorPesos > 0) {
+                // Si hay pesos, desactivar dólares y tipos de cambio
+                desactivarCelda(celdaDolares);
+                desactivarCelda(celdaTCTeorico);
+                desactivarCelda(celdaTCFinal);
+            } else if (valorDolares > 0) {
+                // Si hay dólares, desactivar pesos
+                desactivarCelda(celdaPesos);
+            } else {
+                // Si no hay valores, activar todas las celdas
+                activarCelda(celdaDolares);
+                activarCelda(celdaPesos);
+                activarCelda(celdaTCTeorico);
+                activarCelda(celdaTCFinal);
+            }
+        });
+    }
+
+    // Función para desactivar una celda
+    function desactivarCelda(celda) {
+        if (!celda) return;
+        
+        // Remover clase editable-cell si existe
+        celda.classList.remove('editable-cell');
+        
+        // Agregar clase para indicar visualmente que está desactivada
+        celda.classList.add('celda-desactivada');
+        
+        // Remover eventos click que pudieran estar adjuntos
+        const nuevoElemento = celda.cloneNode(true);
+        celda.parentNode.replaceChild(nuevoElemento, celda);
+    }
+
+    // Función para activar una celda
+    function activarCelda(celda) {
+        if (!celda) return;
+        
+        // Si ya está activa, no hacemos nada
+        if (celda.classList.contains('editable-cell')) return;
+        
+        // Agregar clase editable-cell
+        celda.classList.add('editable-cell');
+        
+        // Remover clase de desactivación si existe
+        celda.classList.remove('celda-desactivada');
+        
+        // Agregar evento click para edición
+        celda.addEventListener('click', function() {
+            startEditing(this);
+        });
+    }
 
     // Función para iniciar la edición de una celda
     function startEditing(cell) {
+        // Verificar si la celda está desactivada
+        if (cell.classList.contains('celda-desactivada')) {
+            return; // No permitir edición si está desactivada
+        }
+        
         // Si ya hay una celda en edición, terminar primero
         if (activeEditCell && activeEditCell !== cell) {
             finishEditing(false); // false = no guardar
@@ -159,21 +266,40 @@
             const originalText = activeEditCell.getAttribute('data-original-text') || '';
             restoreCell(activeEditCell, originalText);
         }
+        
+        // Aplicar restricciones de edición después de finalizar
+        setTimeout(aplicarRestriccionesEdicion, 100);
     }
 
     // Función para restaurar una celda
     function restoreCell(cell, text = '') {
-        // Limpiar la celda de manera segura
-        while (cell && cell.firstChild) {
-            cell.removeChild(cell.firstChild);
-        }
-
-        if (cell) {
+        if (!cell) return;
+        
+        try {
+            // Limpiar la celda de manera segura
+            while (cell.firstChild) {
+                cell.removeChild(cell.firstChild);
+            }
+            
             cell.classList.remove('editing');
             cell.textContent = text;
-
+            
             if (cell === activeEditCell) {
                 activeEditCell = null;
+            }
+        } catch (error) {
+            console.error('Error al restaurar celda:', error);
+            // Si hay error, intentar simplemente asignar el texto
+            if (cell) {
+                try {
+                    cell.textContent = text;
+                    cell.classList.remove('editing');
+                    if (cell === activeEditCell) {
+                        activeEditCell = null;
+                    }
+                } catch (e) {
+                    console.error('Error secundario al restaurar celda:', e);
+                }
             }
         }
     }
@@ -203,7 +329,8 @@
 
         if (!id || !field) {
             console.error('Falta id o field en la celda editable');
-            restoreCell(cell, cell.getAttribute('data-original-text') || '');
+            const originalText = cell.getAttribute('data-original-text') || '';
+            restoreCell(cell, originalText);
             return;
         }
 
@@ -213,8 +340,19 @@
             maximumFractionDigits: 2
         });
 
+        // Guardar una referencia al dataset para acceder después de la llamada fetch
+        const cellInfo = {
+            id: id,
+            field: field,
+            isRealField: cell.classList.contains('columna-final')
+        };
+
         // Restaurar la celda con el nuevo valor formateado
-        restoreCell(cell, formattedValue);
+        try {
+            restoreCell(cell, formattedValue);
+        } catch (e) {
+            console.error('Error al restaurar celda antes del fetch:', e);
+        }
 
         // Crear FormData para envío
         const formData = new FormData();
@@ -234,7 +372,17 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    updateUIWithServerData(cell, data);
+                    // Usar una referencia más estable para la actualización de la UI
+                    const updatedCell = document.querySelector(`[data-id="${cellInfo.id}"][data-field="${cellInfo.field}"]`);
+                    if (updatedCell) {
+                        updateUIWithServerData(updatedCell, data);
+                    } else {
+                        // Si no podemos encontrar la celda original, actualizar por selección directa
+                        updateUIWithoutCell(cellInfo, data);
+                    }
+                    
+                    // Aplicar restricciones de edición después de actualizar la UI
+                    setTimeout(aplicarRestriccionesEdicion, 100);
                 } else {
                     handleServerError(data.message);
                 }
@@ -248,68 +396,184 @@
     // Función para actualizar la UI con datos del servidor
     function updateUIWithServerData(cell, data) {
         try {
-            // Actualizar subtotal en la misma fila si existe
+            if (!cell) return;
+            
+            // Determinar si estamos en una columna final
+            const isRealField = cell.classList.contains('columna-final') || data.isRealField;
+            const row = cell.closest('tr');
+            
+            if (!row) return;
+            
+            // Cuando se actualiza dólares o pesos, necesitamos actualizar ambos subtotales
+            const updateBothSubtotals = ['valorDolaresRtoTeorico', 'valorPesosRtoTeorico'].includes(cell.dataset.field);
+            
+            // Actualizar subtotal teórico si corresponde
             if (data.subtotal !== undefined) {
-                const row = cell.closest('tr');
-                if (row) {
-                    const subtotalCell = row.querySelector('td:nth-child(5)');
-                    if (subtotalCell) {
-                        subtotalCell.textContent = parseFloat(data.subtotal).toLocaleString('es-AR', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        });
-                    }
+                const theoreticSubtotalCell = row.querySelector('td:nth-child(5)');
+                if (theoreticSubtotalCell) {
+                    theoreticSubtotalCell.textContent = parseFloat(data.subtotal).toLocaleString('es-AR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                }
+            }
+            
+            // Actualizar subtotal final si corresponde o si estamos actualizando dólares/pesos
+            if ((isRealField || updateBothSubtotals) && data.subtotalFinal !== undefined) {
+                const finalSubtotalCell = row.querySelector('td:nth-child(7)');
+                if (finalSubtotalCell) {
+                    finalSubtotalCell.textContent = parseFloat(data.subtotalFinal).toLocaleString('es-AR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
                 }
             }
 
-            // Actualizar totales
-            updateTotalElement('tr.table-primary td:nth-child(5)', data.totalTeorico);
-            updateTotalElement('tr.table-primary td:nth-child(7)', data.totalFinal);
-            updateTotalElement('tr.table-info td:nth-child(2)', data.diferencia);
-
+            // Actualizar totales generales
+            if (data.totalTeorico !== undefined) {
+                const totalTeoricoElement = document.querySelector('tr.table-primary td:nth-child(5)');
+                if (totalTeoricoElement) {
+                    totalTeoricoElement.textContent = '$ ' + parseFloat(data.totalTeorico).toLocaleString('es-AR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                }
+            }
+            
+            if (data.totalFinal !== undefined) {
+                const totalFinalElement = document.querySelector('tr.table-primary td:nth-child(7)');
+                if (totalFinalElement) {
+                    totalFinalElement.textContent = '$ ' + parseFloat(data.totalFinal).toLocaleString('es-AR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                }
+            }
+            
+            // Actualizar diferencia
+            if (data.diferencia !== undefined) {
+                const diferenciaElement = document.querySelector('tr.table-info td:nth-child(2)');
+                if (diferenciaElement) {
+                    diferenciaElement.textContent = '$ ' + parseFloat(data.diferencia).toLocaleString('es-AR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                }
+            }
         } catch (error) {
             console.error('Error al actualizar UI:', error);
         }
     }
 
-    // Función auxiliar para actualizar elementos de totales
-    function updateTotalElement(selector, value) {
-        if (value !== undefined) {
-            const element = document.querySelector(selector);
-            if (element) {
-                element.textContent = parseFloat(value).toLocaleString('es-AR', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
+    // Nueva función para actualizar la UI sin referencia a la celda original
+    function updateUIWithoutCell(cellInfo, data) {
+        try {
+            // Encontrar la fila por id
+            const row = document.querySelector(`tr td[data-id="${cellInfo.id}"]`).closest('tr');
+            if (!row) return;
+            
+            // Determinar si estamos en un campo final
+            const isRealField = cellInfo.isRealField || data.isRealField;
+            
+            // Actualizar subtotales según corresponda
+            if (isRealField && data.subtotalFinal !== undefined) {
+                const finalSubtotalCell = row.querySelector('td:nth-child(7)');
+                if (finalSubtotalCell) {
+                    finalSubtotalCell.textContent = parseFloat(data.subtotalFinal).toLocaleString('es-AR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                }
+            } else if (data.subtotal !== undefined) {
+                const theoreticSubtotalCell = row.querySelector('td:nth-child(5)');
+                if (theoreticSubtotalCell) {
+                    theoreticSubtotalCell.textContent = parseFloat(data.subtotal).toLocaleString('es-AR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                }
             }
+            
+            // Actualizar totales generales
+            updateTotals(data);
+        } catch (error) {
+            console.error('Error al actualizar UI sin celda:', error);
+        }
+    }
+
+    // Nueva función para actualizar solo los totales
+    function updateTotals(data) {
+        try {
+            // Actualizar totales generales
+            if (data.totalTeorico !== undefined) {
+                const totalTeoricoElement = document.querySelector('tr.table-primary td:nth-child(5)');
+                if (totalTeoricoElement) {
+                    totalTeoricoElement.textContent = '$ ' + parseFloat(data.totalTeorico).toLocaleString('es-AR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                }
+            }
+            
+            if (data.totalFinal !== undefined) {
+                const totalFinalElement = document.querySelector('tr.table-primary td:nth-child(7)');
+                if (totalFinalElement) {
+                    totalFinalElement.textContent = '$ ' + parseFloat(data.totalFinal).toLocaleString('es-AR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                }
+            }
+            
+            // Actualizar diferencia
+            if (data.diferencia !== undefined) {
+                const diferenciaElement = document.querySelector('tr.table-info td:nth-child(2)');
+                if (diferenciaElement) {
+                    diferenciaElement.textContent = '$ ' + parseFloat(data.diferencia).toLocaleString('es-AR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Error al actualizar totales:', error);
+        }
+    }
+
+    // Función auxiliar para actualizar elementos de totales
+    function updateTotalElement(selector, formattedValue) {
+        const element = document.querySelector(selector);
+        if (element) {
+            element.textContent = formattedValue;
         }
     }
 
     // Manejar errores del servidor
     function handleServerError(message) {
         alert('Error: ' + (message || 'Error desconocido'));
-
-        // Opcional: recargar la página para asegurar datos correctos
-        // location.reload();
     }
 
-    // Inicializar las celdas editables
-    const editableCells = document.querySelectorAll('.editable-cell');
-    if (editableCells && editableCells.length > 0) {
-        editableCells.forEach(cell => {
-            if (cell) {
-                cell.addEventListener('click', function () {
-                    startEditing(this);
-                });
-            }
-        });
-    }
-
-    // Manejar clics fuera para finalizar edición
-    document.addEventListener('click', function (e) {
-        if (activeEditCell && !activeEditCell.contains(e.target)) {
-            finishEditing(true);
+    // Documento cargado
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar botón de toggle para columnas finales
+        const toggleBtn = document.getElementById('toggleFinalColumns');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', toggleFinalColumns);
+        }
+        
+        // Aplicar restricciones iniciales
+        aplicarRestriccionesEdicion();
+        
+        // Inicializar las celdas editables
+        const editableCells = document.querySelectorAll('.editable-cell');
+        if (editableCells && editableCells.length > 0) {
+            editableCells.forEach(cell => {
+                if (cell && !cell.classList.contains('celda-desactivada')) {
+                    cell.addEventListener('click', function () {
+                        startEditing(this);
+                    });
+                }
+            });
         }
     });
-
 </script>

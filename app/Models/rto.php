@@ -10,7 +10,7 @@ class rto extends Model
     protected $primaryKey = 'id';
     protected $fillable = [
         'proveedores_id',
-        'camiones_id',
+        'camion',
         'nroFacturaRto',
         'fechaIngresoRto',
         'totalTempRto',

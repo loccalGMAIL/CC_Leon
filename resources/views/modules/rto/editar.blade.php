@@ -18,7 +18,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Detalle de Remito Nro:
-                                {{ str_pad($items->proveedores_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($items->camiones_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($items->id, 6, '0', STR_PAD_LEFT) }}
+                                {{ str_pad($items->proveedores_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($items->camion, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($items->id, 6, '0', STR_PAD_LEFT) }}
                             </h5>
 
                             <!-- Botón para mostrar/ocultar detalles del remito -->
@@ -68,7 +68,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-6">
+                                    {{-- <div class="col-md-6">
                                         <label for="idCamion" class="form-label">Camión</label>
                                         <select class="form-select" id="idCamion" name="idCamion" required disabled>
                                             <option value="">Primero seleccione un proveedor</option>
@@ -77,14 +77,15 @@
                                             Este proveedor no tiene camiones asignados. Por favor, agregue un camión
                                             primero.
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 </div>
                                 {{-- Fin Columnas --}}
                             </div>
 
 
                             <div class="d-flex gap-2 mt-3 mb-3">
-                                <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#agregarElementoModal">
+                                <a href="#" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#agregarElementoModal">
                                     <i class="fa-solid fa-circle-plus"></i> Agregar nuevo
                                 </a>
                                 <button type="button" id="toggleFinalColumns" class="btn btn-primary">
@@ -114,11 +115,11 @@
             cursor: pointer;
             position: relative;
         }
-    
+
         .editable-cell:hover {
             background-color: #f5f5f5;
         }
-    
+
         .editable-cell:hover::after {
             content: '✎';
             position: absolute;
@@ -126,12 +127,12 @@
             color: #6c757d;
             font-size: 12px;
         }
-    
+
         .editable-cell.editing {
             padding: 0 !important;
             background-color: #e8f4ff !important;
         }
-    
+
         .editable-cell input {
             width: 100%;
             height: 100%;
@@ -140,31 +141,39 @@
             text-align: right;
             outline: none;
         }
-    
+
         .columna-final {
             background-color: #e2f0ff;
         }
-    
+
         .celda-desactivada {
             background-color: #f0f0f0;
             color: #999;
             cursor: not-allowed;
         }
-    
+
         .toggle-column.active {
             animation: highlight-column 1s ease;
         }
-    
+
         @keyframes highlight-column {
-            0% { background-color: #e2f0ff; }
-            50% { background-color: #c2e0ff; }
-            100% { background-color: #e2f0ff; }
+            0% {
+                background-color: #e2f0ff;
+            }
+
+            50% {
+                background-color: #c2e0ff;
+            }
+
+            100% {
+                background-color: #e2f0ff;
+            }
         }
-    
+
         #toggleFinalColumns {
             transition: all 0.3s ease;
         }
-    
+
         #toggleFinalColumns:hover {
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
@@ -172,113 +181,28 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Código para mostrar/ocultar los detalles del remito
-            const toggleDetallesBtn = document.getElementById('toggleDetalles');
-            const detallesRemito = document.getElementById('detallesRemito');
+            // // Código para mostrar/ocultar los detalles del remito usando jQuery
+            $(document).ready(function () {
+                $('#toggleDetalles').on('click', function () {
+                    $('#detallesRemito').toggleClass('show');
 
-            if (toggleDetallesBtn && detallesRemito) {
-                // Aseguramos que inicialmente esté oculto con display básico
-                detallesRemito.style.display = 'none';
-
-                toggleDetallesBtn.addEventListener('click', function () {
-                    if (detallesRemito.style.display === 'none') {
-                        // Mostrar detalles
-                        detallesRemito.style.display = 'block';
-                        this.innerHTML = '<i class="fa-solid fa-chevron-up"></i> Ocultar detalles del remito';
+                    if ($('#detallesRemito').hasClass('show')) {
+                        $(this).html('<i class="fa-solid fa-chevron-up"></i> Ocultar detalles del remito');
                     } else {
-                        // Ocultar detalles
-                        detallesRemito.style.display = 'none';
-                        this.innerHTML = '<i class="fa-solid fa-chevron-down"></i> Mostrar detalles del remito';
+                        $(this).html('<i class="fa-solid fa-chevron-down"></i> Mostrar detalles del remito');
                     }
                 });
-            }
+            });
 
             // Referencias a elementos del DOM
             const proveedorSelect = document.getElementById('idProveedor');
             const camionSelect = document.getElementById('idCamion');
             const camionMessage = document.getElementById('camionMessage');
 
-            // Variable para guardar el ID del camión que debe estar seleccionado
-            const camionSeleccionadoId = {{ $items->camiones_id }};
-
             // Asegurar que el proveedor esté seleccionado correctamente
             if (proveedorSelect) {
                 proveedorSelect.value = {{ $items->proveedores_id }};
             }
-
-            // Cargar camiones cuando la página carga si hay un proveedor seleccionado
-            if (proveedorSelect && proveedorSelect.value) {
-                cargarCamiones(proveedorSelect.value, camionSeleccionadoId);
-            }
-
-            // Función para cargar camiones según el proveedor seleccionado
-            function cargarCamiones(proveedorId, camionIdSeleccionado = null) {
-                if (proveedorId) {
-                    // Habilitar el select de camiones
-                    camionSelect.disabled = false;
-
-                    // Limpiar opciones actuales
-                    camionSelect.innerHTML = '<option value="">Cargando camiones...</option>';
-
-                    // La URL correcta con los prefijos de grupo de rutas
-                    const url = `/proveedores/${proveedorId}/camiones`;
-                    console.log('Consultando URL:', url);
-
-                    fetch(url)
-                        .then(response => {
-                            console.log('Respuesta status:', response.status);
-                            if (!response.ok) {
-                                throw new Error(`Error HTTP: ${response.status}`);
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Datos recibidos:', data);
-                            camionSelect.innerHTML = '';
-
-                            if (data.length > 0) {
-                                camionSelect.innerHTML = '<option value="">Seleccione un camión</option>';
-
-                                data.forEach(camion => {
-                                    console.log('Camión:', camion);
-                                    const option = document.createElement('option');
-                                    option.value = camion.id;
-                                    const patenteTexto = camion.patente ? camion.patente : 'Sin patente';
-                                    option.textContent = `${camion.id} - ${patenteTexto}`;
-
-                                    // Si este es el camión que estaba asociado al remito, seleccionarlo
-                                    if (camionIdSeleccionado && camion.id == camionIdSeleccionado) {
-                                        option.selected = true;
-                                    }
-
-                                    camionSelect.appendChild(option);
-                                });
-
-                                camionMessage.classList.add('d-none');
-                            } else {
-                                camionSelect.innerHTML = '<option value="">No hay camiones disponibles</option>';
-                                camionSelect.disabled = true;
-                                camionMessage.classList.remove('d-none');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error detallado:', error);
-                            camionSelect.innerHTML = `<option value="">Error: ${error.message}</option>`;
-                        });
-                } else {
-                    // Si no hay proveedor seleccionado
-                    camionSelect.disabled = true;
-                    camionSelect.innerHTML = '<option value="">Primero seleccione un proveedor</option>';
-                    camionMessage.classList.add('d-none');
-                }
-            }
-
-            // Escuchar cambios en el selector de proveedor
-            proveedorSelect.addEventListener('change', function () {
-                const proveedorId = this.value;
-                console.log('Proveedor seleccionado:', proveedorId);
-                cargarCamiones(proveedorId);
-            });
 
             // Manejo del modal de proveedor
             const agregarProveedorModal = document.getElementById('agregarProveedorModal');
@@ -481,7 +405,7 @@
                 });
             });
 
- 
+
         });
     </script>
 

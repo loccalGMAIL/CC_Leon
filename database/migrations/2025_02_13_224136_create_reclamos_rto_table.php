@@ -11,9 +11,10 @@ return new class extends Migration
         Schema::create('reclamos_rto', function (Blueprint $table) {
             $table->id();
             $table->foreignId('Rto_id')->constrained('rto');
-            $table->text('descripcionReclamoRto');
+            $table->text('producto');
+            $table->decimal('cantidad', 10, 2);
+            $table->text('observaciones')->nullable();
             $table->enum('estadoReclamoRto', ['pendiente', 'resuelto']);
-            $table->text('resolucionReclamoRto')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

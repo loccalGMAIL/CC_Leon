@@ -27,6 +27,7 @@
         <table class="table datatable">
           <thead>
           <tr>
+            <th></th>
             <th class="text-center">Nombre</th>
             <th class="text-center">DNI</th>
             <th class="text-center">Razon Social</th>
@@ -41,6 +42,7 @@
           <tbody>
           @foreach ($items as $item)
           <tr class="text-center">
+            <td>{{$item->id}}</td>
           <td>{{$item->nombreProveedor}}</td>
           <td>{{$item->dniProveedor}}</td>
           <td>{{$item->razonSocialProveedor}}</td>

@@ -33,22 +33,11 @@
       </li><!-- End Components Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#components-nav2" data-bs-toggle="collapse" href="#">
-          <i class="fa-solid fa-truck-field"></i><span>Proveedores</span><i class="bi bi-chevron-down ms-auto"></i>
+        <a class="nav-link collapsed" href="{{route('proveedores')}}">
+          <i class="fa-solid fa-truck-field"></i>
+          <span>Proveedores</span>
         </a>
-        <ul id="components-nav2" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="{{route('proveedores')}}">
-              <i class="bi bi-circle"></i><span>Listar</span>
-            </a>
-          </li>
-          <li>
-            <a href="{{route('proveedores.camiones')}}">
-              <i class="bi bi-circle"></i><span>Camiones</span>
-            </a>
-          </li>
-        </ul>
-      </li><!-- End Components Nav -->
+      </li><!-- End Login Page Nav -->
 
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{route('usuarios')}}">

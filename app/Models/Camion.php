@@ -8,7 +8,7 @@ class Camion extends Model
 {
     protected $table = 'camiones';
     protected $primaryKey = 'id';
-    protected $fillable = ['patente', 'proveedores_id'];
+    protected $fillable = ['contador', 'proveedores_id'];
     public $timestamps = true;
     protected $softDelete = true;
 

@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('rto', function (Blueprint $table) {
             $table->id();
             $table->foreignId('proveedores_id')->constrained('proveedores');
-            $table->foreignId('camiones_id')->constrained('camiones');
+            $table->integer('camion');
             $table->string('nroFacturaRto', 50);
             $table->date('fechaIngresoRto');            
             $table->decimal('totalTempRto', 10, 2)->nullable();

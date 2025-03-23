@@ -41,18 +41,19 @@
           @foreach ($items as $item)
         <tr class="text-center">
         <td>
-          {{ str_pad($item->proveedores_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($item->camiones_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($item->id, 6, '0', STR_PAD_LEFT) }}
+        {{ str_pad($item->proveedores_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($item->camion, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($item->id, 6, '0', STR_PAD_LEFT) }}
         </td>
-        <td>{{ $item->proveedor->nombreProveedor ?? 'Sin proveedor' }}</td>
+        <td>{{ $item->proveedor->razonSocialProveedor ?? 'Sin proveedor' }}</td>
         <td>{{$item->nroFacturaRto}}</td>
         <td>{{ $item->observaciones_count ?? 0 }}</td>
         <td>{{ $item->reclamos_count ?? 0 }}</td>
         <td>{{ \Carbon\Carbon::parse($item->fechaIngresoRto)->format('d/m/Y') }}</td>
         <td>{{ \Carbon\Carbon::parse($item->updated_at)->format('d/m/Y H:i') }}</td>
         <td>
-          <a href="{{route('remitos.edit',$item->id)}}" class="badge bg-success d-block mb-1"><span>Editar</span></a>
-          <a href="#" class="badge bg-secondary d-block mb-1"><span>Observaciones</span></a>
-          <a href="#" class="badge bg-danger d-block"><span>Reclamos</span></a>
+        <a href="{{route('remitos.edit', $item->id)}}"
+          class="badge bg-success d-block mb-1"><span>Editar</span></a>
+        <a href="#" class="badge bg-secondary d-block mb-1"><span>Observaciones</span></a>
+        <a href="#" class="badge bg-danger d-block"><span>Reclamos</span></a>
         </td>
         </tr>
       @endforeach
@@ -98,7 +99,7 @@
               <option value="">Seleccionar proveedor</option>
               @foreach($proveedores as $proveedor)
           <option value="{{ $proveedor->id }}">
-          {{ $proveedor->razonSocialProveedor }} ({{ $proveedor->nombreProveedor }}
+          {{ $proveedor->razonSocialProveedor }} ({{ $proveedor->nombreProveedor }})
           </option>
         @endforeach
               </select>
@@ -109,18 +110,6 @@
               <i class="fa-solid fa-plus"></i>
               </button>
             </div>
-            </div>
-          </div>
-          </div>
-
-          <div class="row mb-3">
-          <div class="col-md-12">
-            <label for="idCamion" class="form-label">Camión</label>
-            <select class="form-select" id="idCamion" name="idCamion" required disabled>
-            <option value="">Primero seleccione un proveedor</option>
-            </select>
-            <div id="camionMessage" class="text-danger mt-2 d-none">
-            Este proveedor no tiene camiones asignados. Por favor, agregue un camión primero.
             </div>
           </div>
           </div>
@@ -148,32 +137,32 @@
         <form id="nuevoProveedorForm" method="POST" action="{{ route('proveedores.store') }}">
           @csrf
           <div class="mb-3">
-          <label for="nombreProveedor" class="form-label">Nombre del proveedor</label>
+          <label for="nombreProveedor" class="form-label">Nombre del proveedor *</label>
           <input type="text" class="form-control" id="nombreProveedor" name="nombreProveedor" required>
           </div>
           <div class="mb-3">
           <label for="dniProveedor" class="form-label">DNI</label>
-          <input type="text" class="form-control" id="dniProveedor" name="dniProveedor" >
+          <input type="text" class="form-control" id="dniProveedor" name="dniProveedor">
           </div>
           <div class="mb-3">
-          <label for="razonSocialProveedor" class="form-label">Razón Social</label>
+          <label for="razonSocialProveedor" class="form-label">Razón Social *</label>
           <input type="text" class="form-control" id="razonSocialProveedor" name="razonSocialProveedor" required>
           </div>
           <div class="mb-3">
-          <label for="cuitProveedor" class="form-label">CUIT</label>
+          <label for="cuitProveedor" class="form-label">CUIT *</label>
           <input type="text" class="form-control" id="cuitProveedor" name="cuitProveedor" required>
           </div>
           <div class="mb-3">
           <label for="telefonoProveedor" class="form-label">Teléfono</label>
-          <input type="text" class="form-control" id="telefonoProveedor" name="telefonoProveedor" >
+          <input type="text" class="form-control" id="telefonoProveedor" name="telefonoProveedor">
           </div>
           <div class="mb-3">
           <label for="mailProveedor" class="form-label">Email</label>
-          <input type="email" class="form-control" id="mailProveedor" name="mailProveedor" >
+          <input type="email" class="form-control" id="mailProveedor" name="mailProveedor">
           </div>
           <div class="mb-3">
           <label for="direccionProveedor" class="form-label">Dirección</label>
-          <input type="text" class="form-control" id="direccionProveedor" name="direccionProveedor" >
+          <input type="text" class="form-control" id="direccionProveedor" name="direccionProveedor">
           </div>
 
         </form>
@@ -193,67 +182,6 @@
     document.addEventListener('DOMContentLoaded', function () {
     // Referencias a elementos del DOM
     const proveedorSelect = document.getElementById('idProveedor');
-    const camionSelect = document.getElementById('idCamion');
-    const camionMessage = document.getElementById('camionMessage');
-
-    // Función para cargar camiones según el proveedor seleccionado
-    proveedorSelect.addEventListener('change', function () {
-      const proveedorId = this.value;
-      console.log('Proveedor seleccionado:', proveedorId);
-
-      if (proveedorId) {
-      // Habilitar el select de camiones
-      camionSelect.disabled = false;
-
-      // Limpiar opciones actuales
-      camionSelect.innerHTML = '<option value="">Cargando camiones...</option>';
-
-      // La URL correcta con los prefijos de grupo de rutas
-      const url = `/proveedores/${proveedorId}/camiones`;
-      console.log('Consultando URL:', url);
-
-      fetch(url)
-        .then(response => {
-        console.log('Respuesta status:', response.status);
-        if (!response.ok) {
-          throw new Error(`Error HTTP: ${response.status}`);
-        }
-        return response.json();
-        })
-        .then(data => {
-        console.log('Datos recibidos:', data);
-        camionSelect.innerHTML = '';
-
-        if (data.length > 0) {
-          camionSelect.innerHTML = '<option value="">Seleccione un camión</option>';
-
-          data.forEach(camion => {
-          console.log('Camión:', camion);
-          const option = document.createElement('option');
-          option.value = camion.id;
-          const patenteTexto = camion.patente ? camion.patente : 'Sin patente';
-          option.textContent = `${camion.id} - ${patenteTexto}`;
-          camionSelect.appendChild(option);
-          });
-
-          camionMessage.classList.add('d-none');
-        } else {
-          camionSelect.innerHTML = '<option value="">No hay camiones disponibles</option>';
-          camionSelect.disabled = true;
-          camionMessage.classList.remove('d-none');
-        }
-        })
-        .catch(error => {
-        console.error('Error detallado:', error);
-        camionSelect.innerHTML = `<option value="">Error: ${error.message}</option>`;
-        });
-      } else {
-      // Si no hay proveedor seleccionado
-      camionSelect.disabled = true;
-      camionSelect.innerHTML = '<option value="">Primero seleccione un proveedor</option>';
-      camionMessage.classList.add('d-none');
-      }
-    });
 
     // Manejar cierre de modal de proveedor y actualizar lista
     const agregarProveedorModal = document.getElementById('agregarProveedorModal');
@@ -299,9 +227,6 @@
         // Seleccionar el nuevo proveedor
         proveedorSelect.value = data.proveedor.id;
 
-        // Disparar el evento change para cargar los camiones
-        proveedorSelect.dispatchEvent(new Event('change'));
-
         // Mostrar notificación de éxito
         alert('Proveedor agregado correctamente');
         } else {
@@ -314,7 +239,9 @@
         alert('Error en el servidor: ' + error.message);
       });
     });
+
     });
+
   </script>
 
 @endsection

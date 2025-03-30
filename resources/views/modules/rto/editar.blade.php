@@ -68,16 +68,7 @@
                                         </div>
                                     </div>
 
-                                    {{-- <div class="col-md-6">
-                                        <label for="idCamion" class="form-label">Camión</label>
-                                        <select class="form-select" id="idCamion" name="idCamion" required disabled>
-                                            <option value="">Primero seleccione un proveedor</option>
-                                        </select>
-                                        <div id="camionMessage" class="text-danger mt-2 d-none">
-                                            Este proveedor no tiene camiones asignados. Por favor, agregue un camión
-                                            primero.
-                                        </div>
-                                    </div> --}}
+
                                 </div>
                                 {{-- Fin Columnas --}}
                             </div>
@@ -91,6 +82,16 @@
                                 <button type="button" id="toggleFinalColumns" class="btn btn-primary">
                                     <i class="fa-solid fa-eye"></i> Mostrar Columnas Finales
                                 </button>
+
+                                
+                                <button id="btnPDF" class="btn btn-sm btn-danger">
+                                    <i class="fa-solid fa-file-pdf"></i> PDF
+                                </button>
+                                
+                                <button id="btnPrint" class="btn btn-sm btn-success">
+                                    <i class="fa-solid fa-print"></i> Imprimir
+                                </button>
+
                             </div>
 
                             <!-- Table with stripped rows -->

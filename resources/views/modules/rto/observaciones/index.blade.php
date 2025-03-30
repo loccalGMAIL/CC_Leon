@@ -41,7 +41,7 @@
           <td>{{$item->fecha}}</td>
           <td>{{$item->rto_id}}</td>
           <td>{{$item->descripcionObservacionesRto}}</td>
-          <td>{{$item->resolucion}}</td>          
+          {{-- <td>{{$item->resolucion}}</td>           --}}
           <td>
           <a href="#" class="btn btn-warning bt-sm"><i class="fa-solid fa-user-pen"></i></a>
           <a href="#" class="btn btn-danger bt-sm"><i class="fa-solid fa-user-gear"></i></a>

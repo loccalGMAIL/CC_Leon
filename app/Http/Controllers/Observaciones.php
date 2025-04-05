@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Observacion;
+use App\Models\Rto;
 
 class Observaciones extends Controller
 {
@@ -30,7 +31,18 @@ class Observaciones extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'Rto_id' => 'required|exists:rto,id',
+            'descripcionObservacionesRto' => 'required|string',
+        ]);
+
+        Observacion::create([
+            'Rto_id' => $request->Rto_id,
+            'descripcionObservacionesRto' => $request->descripcionObservacionesRto,
+            'created_at' => now(), // Esto guardará la fecha seleccionada
+        ]);
+
+        return redirect()->back()->with('success', 'Observación agregada correctamente');
     }
 
     /**
@@ -38,7 +50,17 @@ class Observaciones extends Controller
      */
     public function show(string $id)
     {
-        //
+        $remito = Rto::with('proveedor')->findOrFail($id);
+        $items = Observacion::with('proveedor')
+            ->where('Rto_id', $id)
+            ->get();
+
+        return view('modules.rto.observaciones.index', [
+            'items' => $items,
+            'remito' => $remito,
+            'titulo' => 'Observaciones del Remito',
+            'singleRemito' => true // Bandera para indicar que estamos viendo un solo remito
+        ]);
     }
 
     /**
@@ -54,7 +76,17 @@ class Observaciones extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'descripcionObservacionesRto' => 'required|string',
+        ]);
+
+        $observacion = Observacion::findOrFail($id);
+        $observacion->update([
+            'descripcionObservacionesRto' => $request->descripcionObservacionesRto,
+            'updated_at' => now(), // Esto guardará la fecha seleccionada
+        ]);
+
+        return redirect()->back()->with('success', 'Observación actualizada correctamente');
     }
 
     /**
@@ -62,6 +94,9 @@ class Observaciones extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $observacion = Observacion::findOrFail($id);
+        $observacion->delete();
+
+        return redirect()->back()->with('success', 'Observación eliminada correctamente');
     }
 }

@@ -26,4 +26,13 @@ class rto extends Model
     {
         return $this->belongsTo(Camion::class, 'id');
     }
+
+    public function observaciones()
+    {
+        return $this->hasMany(Observacion::class, 'Rto_id');
+    }
+    public function reclamos()
+    {
+        return $this->hasMany(Reclamo::class, 'Rto_id');
+    }
 }

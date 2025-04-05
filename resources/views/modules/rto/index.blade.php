@@ -49,12 +49,19 @@
         <td>{{ $item->reclamos_count ?? 0 }}</td>
         <td>{{ \Carbon\Carbon::parse($item->fechaIngresoRto)->format('d/m/Y') }}</td>
         <td>{{ \Carbon\Carbon::parse($item->updated_at)->format('d/m/Y H:i') }}</td>
-        <td>
-        <a href="{{route('remitos.edit', $item->id)}}"
-          class="badge bg-success d-block mb-1"><span>Editar</span></a>
-        <a href="#" class="badge bg-secondary d-block mb-1"><span>Observaciones</span></a>
-        <a href="#" class="badge bg-danger d-block"><span>Reclamos</span></a>
+        <td class="d-flex justify-content-center gap-2">
+        <a href="{{ route('remitos.edit', $item->id) }}" class="badge bg-success" title="Editar">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </a>
+        <a href="{{ route('observaciones.show', $item->id) }}" class="badge bg-secondary"
+          title="Ver Observaciones">
+          <i class="fa-solid fa-bullseye"></i>
+        </a>
+        <a href="{{ route('reclamos.show', $item->id) }}" class="badge bg-danger" title="Ver Reclamos">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </a>
         </td>
+
         </tr>
       @endforeach
         </table>

@@ -44,10 +44,18 @@ Route::prefix('remitos')->middleware('auth')->group(function () {
 
 route::prefix('reclamos')->middleware('auth')->group(function () {
     Route::get('/', [Reclamos::class, 'index'])->name('reclamos');
+    Route::post('/reclamos', [Reclamos::class, 'store'])->name('reclamos.store');
+    Route::put('/reclamos/{id}', [Reclamos::class, 'update'])->name('reclamos.update');
+    Route::get('/show/{rtoId?}', [Reclamos::class, 'show'])->name('reclamos.show');
+    Route::delete('/delete/{id}', [Reclamos::class, 'destroy'])->name('reclamos.destroy');
 });
 
 route::prefix('observaciones')->middleware('auth')->group(function () {
     Route::get('/', [Observaciones::class, 'index'])->name('observaciones');
+    Route::post('/store', [Observaciones::class, 'store'])->name('observaciones.store');
+    Route::get('/show/{remito}', [Observaciones::class, 'show'])->name('observaciones.show');
+    Route::put('/update/{id}', [Observaciones::class, 'update'])->name('observaciones.update');
+    Route::delete('/delete/{id}', [Observaciones::class, 'destroy'])->name('observaciones.destroy');
 });
 
 Route::prefix('proveedores')->middleware('auth')->group(function () {

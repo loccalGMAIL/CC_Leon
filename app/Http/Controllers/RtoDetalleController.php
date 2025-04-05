@@ -109,7 +109,8 @@ class RtoDetalleController extends Controller
 
                 $totalTeorico = $rto->totalTempRto;
                 $totalFinal = $value;
-                $diferencia = $totalFinal - $totalTeorico;
+                // $diferencia = $totalFinal - $totalTeorico;
+                $diferencia = $totalTeorico - $totalFinal;
 
                 return response()->json([
                     'success' => true,

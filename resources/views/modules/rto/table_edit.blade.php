@@ -72,7 +72,7 @@
         <tr class="table-info">
             <td class="fw-bold">DIFERENCIA:</td>
             <td colspan="2" class="fw-bold text-end">
-                $ {{ number_format($totalFinal - $totalTeorico, 2, ',', '.') }}
+                $ {{ number_format($totalTeorico - $totalFinal, 2, ',', '.') }}
             </td>
             <td colspan="2"></td>
             <td class="columna-final toggle-column" colspan="2" style="display: none;"></td>

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->decimal('cantidad', 10, 2);
             $table->text('observaciones')->nullable();
             $table->enum('estadoReclamoRto', ['pendiente', 'resuelto']);
+            $table->text('resolucionReclamoRto')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

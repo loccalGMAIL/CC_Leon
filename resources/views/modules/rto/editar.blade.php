@@ -7,8 +7,13 @@
     <main id="main" class="main">
 
         <div class="pagetitle">
-            <h1><a href="{{Route('remitos')}}"><i class="fa-solid fa-circle-arrow-left"></i></a> Editar Remitos</h1>
-
+            <h1>Editar Remitos</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('remitos') }}">Remitos</a></li>
+                    <li class="breadcrumb-item active">Editar Remito {{ str_pad($items->id, 6, '0', STR_PAD_LEFT) }}</li>
+                </ol>
+            </nav>
         </div><!-- End Page Title -->
 
         <section class="section">
@@ -75,24 +80,28 @@
 
 
                             <div class="d-flex gap-2 mt-3 mb-3">
-                                <a href="#" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#agregarElementoModal">
+                                <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#agregarElementoModal">
                                     <i class="fa-solid fa-circle-plus"></i> Agregar nuevo
                                 </a>
-                                <button type="button" id="toggleFinalColumns" class="btn btn-primary">
+                                <button type="button" id="toggleFinalColumns" class="btn btn-sm btn-primary">
                                     <i class="fa-solid fa-eye"></i> Mostrar Columnas Finales
                                 </button>
-
-                                
                                 <button id="btnPDF" class="btn btn-sm btn-danger">
                                     <i class="fa-solid fa-file-pdf"></i> PDF
                                 </button>
-                                
                                 <button id="btnPrint" class="btn btn-sm btn-success">
                                     <i class="fa-solid fa-print"></i> Imprimir
                                 </button>
-
+                                <a href="#" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#observacionesModal" 
+                                    data-rto-id="{{ $items->id }}">
+                                    <i class="fa-solid fa-circle-plus"></i> Observación
+                                </a>
+                                <a href="#" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#reclamosModal" 
+                                    data-rto-id="{{ $items->id }}" data-nro-remito="{{ $items->nroFacturaRto }}">
+                                    <i class="fa-solid fa-circle-plus"></i> Reclamo
+                                </a>
                             </div>
+                            
 
                             <!-- Table with stripped rows -->
                             @include('modules.rto.table_edit')
@@ -408,6 +417,74 @@
 
 
         });
+
+        // Detectar cuando se abre el modal
+        const observacionesModal = document.getElementById('observacionesModal');
+        if (observacionesModal) {
+            observacionesModal.addEventListener('show.bs.modal', function (event) {
+                // Botón que activó el modal
+                const button = event.relatedTarget;
+
+                // Extraer info de los atributos data-*
+                const rtoId = button.getAttribute('data-rto-id');
+                const nroRemito = button.getAttribute('data-nro-remito');
+
+                // Actualizar contenido del modal
+                const modalRtoIdInput = document.getElementById('modal_rto_id');
+                // const modalNroRemitoInput = document.getElementById('modal_nroRemito');
+                const fechaInput = document.getElementById('fecha');
+
+                if (modalRtoIdInput) modalRtoIdInput.value = rtoId;
+                // if (modalNroRemitoInput) modalNroRemitoInput.value = nroRemito;
+                if (fechaInput) fechaInput.value = new Date().toISOString().split('T')[0]; // Fecha actual
+            });
+        }
+
+        // Detectar cuando se abre el modal de reclamos
+        const reclamosModal = document.getElementById('reclamosModal');
+        if (reclamosModal) {
+            reclamosModal.addEventListener('show.bs.modal', function (event) {
+                // Botón que activó el modal
+                const button = event.relatedTarget;
+
+                // Extraer info de los atributos data-*
+                const rtoId = button.getAttribute('data-rto-id');
+                const nroRemito = button.getAttribute('data-nro-remito');
+
+                // Actualizar contenido del modal
+                const modalRtoIdInput = document.getElementById('reclamo_rto_id');
+                const nroRemitoInput = document.getElementById('nroRemitoReclamo');
+
+                if (modalRtoIdInput) modalRtoIdInput.value = rtoId;
+                if (nroRemitoInput) nroRemitoInput.value = nroRemito;
+
+                // Resetear el formulario al abrir
+                document.getElementById('reclamoForm').reset();
+                document.getElementById('estadoReclamoRto').value = 'pendiente';
+                toggleResolucionField();
+            });
+        }
+
+        // Mostrar/ocultar campo de resolución según el estado
+        // const estadoSelect = document.getElementById('estadoReclamoRto');
+        // if (estadoSelect) {
+        //     estadoSelect.addEventListener('change', toggleResolucionField);
+        // }
+
+        // function toggleResolucionField() {
+        //     const estadoSelect = document.getElementById('estadoReclamoRto');
+        //     const resolucionContainer = document.getElementById('resolucionContainer');
+
+        //     if (!estadoSelect || !resolucionContainer) return;
+
+        //     if (estadoSelect.value === 'resuelto') {
+        //         resolucionContainer.style.display = 'block';
+        //         document.getElementById('resolucionReclamoRto').setAttribute('required', 'required');
+        //     } else {
+        //         resolucionContainer.style.display = 'none';
+        //         document.getElementById('resolucionReclamoRto').removeAttribute('required');
+        //     }
+        // }
     </script>
 
 @endsection

@@ -11,4 +11,9 @@ class Observacion extends Model
     protected $fillable = ['id', 'Rto_id','descripcionObservacionesRto', 'created_at', 'updated_at'];
     protected $hidden = ['created_at', 'updated_at'];
     public $timestamps = true;
+
+    public function rto()
+    {
+        return $this->belongsTo(Rto::class, 'Rto_id');
+    }
 }

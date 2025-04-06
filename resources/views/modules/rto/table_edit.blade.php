@@ -6,6 +6,7 @@
             <th class="text-center">Pesos</th>
             <th class="text-center">T.C. Teórico</th>
             <th class="text-center">SubTotal Teórico</th>
+            <th class="text-center columna-final toggle-column" style="display: none;">Pesos Final</th>
             <th class="text-center columna-final toggle-column" style="display: none;">T.C. Final</th>
             <th class="text-center columna-final toggle-column" style="display: none;">SubTotal Final</th>
             <th class="text-center">Acciones</th>
@@ -22,6 +23,7 @@
                     $totalTeorico += $subtotalTeorico;
 
                     // Obtenemos el valor final si existe
+                    $valorPesosRtoReal = $detalle->valorPesosRtoReal ?? 0;
                     $tcFinal = $detalle->TC_RtoReal ?? 0;
                     $subtotalFinal = $detalle->subTotalRtoReal;
                     $totalFinal += $subtotalFinal;
@@ -41,6 +43,10 @@
                     </td>
                     <td class="text-end" data-type="peso" data-id="{{ $detalle->id }}" data-field="subTotalRtoTeorico">
                         {{ number_format($subtotalTeorico, 2, ',', '.') }}
+                    </td>
+                    <td class="text-end columna-final toggle-column editable-cell" data-type="peso" data-id="{{ $detalle->id }}"
+                        data-field="valorPesosRtoReal" style="display: none;">
+                        {{ number_format($valorPesosRtoReal, 2, ',', '.') }}
                     </td>
                     <td class="text-end columna-final toggle-column editable-cell" data-type="tc" data-id="{{ $detalle->id }}"
                         data-field="TC_RtoReal" style="display: none;">
@@ -64,19 +70,19 @@
             <td></td>
             <td class="fw-bold text-end">$ {{ number_format($totalTeorico, 2, ',', '.') }}</td>
             <td class="columna-final toggle-column" style="display: none;"></td>
+            <td class="columna-final toggle-column" style="display: none;"></td>
             <td class="fw-bold text-end columna-final toggle-column" data-type="total" data-id="{{ $items->id }}"
                 data-field="totalFinalRto" style="display: none;">$ {{ number_format($totalFinal, 2, ',', '.') }}</td>
-            <td></td>
         </tr>
         <!-- Fila de diferencia -->
         <tr class="table-info">
             <td class="fw-bold">DIFERENCIA:</td>
+            <td></td>
+            <td></td>
             <td colspan="2" class="fw-bold text-end">
                 $ {{ number_format($totalTeorico - $totalFinal, 2, ',', '.') }}
             </td>
-            <td colspan="2"></td>
-            <td class="columna-final toggle-column" colspan="2" style="display: none;"></td>
-            <td></td>
+
         </tr>
     </tbody>
 </table>
@@ -103,286 +109,308 @@
 
     // Función para imprimir
     function printTable() {
-        // Obtener la tabla de remitos
-        const tableHTML = document.querySelector('.remitos-datatable').outerHTML;
+    // Obtener la tabla de remitos
+    const tableHTML = document.querySelector('.remitos-datatable').outerHTML;
 
-        // Obtener detalles del remito
-        const nroRemito = document.querySelector('.card-title').textContent.trim().split('Nro:')[1]?.trim() || '';
+    // Obtener detalles del remito
+    const nroRemito = document.querySelector('.card-title').textContent.trim().split('Nro:')[1]?.trim() || '';
 
-        // Obtener información del proveedor del select
-        let proveedorText = 'No especificado';
-        try {
-            const proveedorSelect = document.getElementById('idProveedor');
-            if (proveedorSelect && proveedorSelect.selectedIndex >= 0) {
-                proveedorText = proveedorSelect.options[proveedorSelect.selectedIndex].text;
-            }
-        } catch (e) {
-            console.error('Error al obtener proveedor:', e);
+    // Obtener información del proveedor del select
+    let proveedorText = 'No especificado';
+    try {
+        const proveedorSelect = document.getElementById('idProveedor');
+        if (proveedorSelect && proveedorSelect.selectedIndex >= 0) {
+            proveedorText = proveedorSelect.options[proveedorSelect.selectedIndex].text;
         }
-
-        // Obtener fecha y número de factura
-        let fechaIngreso = '';
-        let nroFactura = 'No especificado';
-        try {
-            const fechaInput = document.getElementById('fechaIngresoRto');
-            if (fechaInput) {
-                fechaIngreso = fechaInput.value;
-            } else {
-                fechaIngreso = new Date().toISOString().slice(0, 10);
-            }
-
-            const facturaInput = document.getElementById('nroFacturaRto');
-            if (facturaInput) {
-                nroFactura = facturaInput.value;
-            }
-        } catch (e) {
-            console.error('Error al obtener fecha o factura:', e);
-        }
-
-        // Formatear fecha para mostrar
-        let fechaFormateada = '';
-        try {
-            if (fechaIngreso) {
-                fechaFormateada = new Date(fechaIngreso).toLocaleDateString('es-AR');
-            } else {
-                fechaFormateada = new Date().toLocaleDateString('es-AR');
-            }
-        } catch (e) {
-            console.error('Error al formatear fecha:', e);
-            fechaFormateada = new Date().toLocaleDateString('es-AR');
-        }
-
-        // Verificar valores y usar predeterminados si es necesario
-        if (!proveedorText || proveedorText === '') {
-            proveedorText = 'No especificado';
-        }
-
-        if (!nroFactura || nroFactura === '') {
-            nroFactura = 'No especificado';
-        }
-
-        if (!fechaFormateada || fechaFormateada === '') {
-            fechaFormateada = new Date().toLocaleDateString('es-AR');
-        }
-
-        console.log('Valores finales para impresión:');
-        console.log('Proveedor:', proveedorText);
-        console.log('Factura:', nroFactura);
-        console.log('Fecha:', fechaFormateada);
-
-        // Crear ventana de impresión
-        const printWindow = window.open('', '_blank');
-
-        // Escribir el contenido con estilos optimizados para impresión
-        printWindow.document.write(`
-        <html>
-        <head>
-            <title>Impresión de Remito ${nroRemito}</title>
-            <style>
-                    /* Esta es la línea clave para ocultar el encabezado */
-    @page :first {
-        margin-top: 0;
+    } catch (e) {
+        console.error('Error al obtener proveedor:', e);
     }
-                /* Estilos generales */
-                body {
-                    font-family: Arial, sans-serif;
-                    font-size: 11px; /* Tipografía más pequeña */
-                    line-height: 1.3;
-                    color: #000;
-                    margin: 0;
-                    padding: 10px;
-                }
-                
-                /* Estilos de cabecera */
-                .header {
-                    margin-bottom: 15px;
-                    border-bottom: 1px solid #ddd;
-                    padding-bottom: 10px;
-                }
-                
-                h1 {
-                    font-size: 16px;
-                    margin: 0 0 5px 0;
-                }
-                
-                h2 {
-                    font-size: 14px;
-                    margin: 0 0 5px 0;
-                }
-                
-                .fecha {
-                    font-style: italic;
-                    margin-bottom: 5px;
-                }
-                
-                /* Estilos para detalles del remito */
-                .remito-detalles {
-                    margin-bottom: 15px;
-                    padding: 10px;
-                    border: 1px solid #ddd;
-                    background-color: #f9f9f9;
-                }
-                
-                .remito-detalles table {
-                    width: 100%;
-                    border-collapse: collapse;
-                }
-                
-                .remito-detalles table td {
-                    padding: 3px;
-                    border: none;
-                }
-                
-                .remito-detalles .label {
-                    font-weight: bold;
-                    width: 120px;
-                }
-                
-                /* Estilos de tabla */
-                table {
-                    border-collapse: collapse;
-                    width: 100%;
-                    margin-bottom: 15px;
-                }
-                
-                th, td {
-                    border: 1px solid #ddd;
-                    padding: 4px; /* Padding más compacto */
-                    text-align: left;
-                    font-size: 10px; /* Tipografía aún más pequeña para la tabla */
-                }
-                
-                th {
-                    background-color: #f2f2f2;
-                    font-weight: bold;
-                }
-                
-                /* Clases para ocultar columnas no deseadas */
-                .toggle-column:not(.visible) {
-                    display: none;
-                }
-                
-                /* Ocultar columna de acciones */
-                th:last-child, td:last-child {
-                    display: none;
-                }
-                
-                /* Estilos para datos numéricos */
-                .text-end, .text-right {
-                    text-align: right;
-                }
-                
-                /* Estilos para filas especiales */
-                .table-primary, .table-info {
-                    font-weight: bold;
-                }
-                
-                .table-primary {
-                    background-color: #e6f2ff !important;
-                }
-                
-                .table-info {
-                    background-color: #e8f4f8 !important;
-                }
-                
-                /* Pies de página */
-                .footer {
-                    margin-top: 20px;
-                    font-size: 9px;
-                    text-align: center;
-                    border-top: 1px solid #ddd;
-                    padding-top: 10px;
-                }
-                    .company-header {
+
+    // Obtener fecha y número de factura
+    let fechaIngreso = '';
+    let nroFactura = 'No especificado';
+    try {
+        const fechaInput = document.getElementById('fechaIngresoRto');
+        if (fechaInput) {
+            fechaIngreso = fechaInput.value;
+        } else {
+            fechaIngreso = new Date().toISOString().slice(0, 10);
+        }
+
+        const facturaInput = document.getElementById('nroFacturaRto');
+        if (facturaInput) {
+            nroFactura = facturaInput.value;
+        }
+    } catch (e) {
+        console.error('Error al obtener fecha o factura:', e);
+    }
+
+    // Formatear fecha para mostrar
+    let fechaFormateada = '';
+    try {
+        if (fechaIngreso) {
+            fechaFormateada = new Date(fechaIngreso).toLocaleDateString('es-AR');
+        } else {
+            fechaFormateada = new Date().toLocaleDateString('es-AR');
+        }
+    } catch (e) {
+        console.error('Error al formatear fecha:', e);
+        fechaFormateada = new Date().toLocaleDateString('es-AR');
+    }
+
+    // Verificar valores y usar predeterminados si es necesario
+    if (!proveedorText || proveedorText === '') {
+        proveedorText = 'No especificado';
+    }
+
+    if (!nroFactura || nroFactura === '') {
+        nroFactura = 'No especificado';
+    }
+
+    if (!fechaFormateada || fechaFormateada === '') {
+        fechaFormateada = new Date().toLocaleDateString('es-AR');
+    }
+
+    console.log('Valores finales para impresión:');
+    console.log('Proveedor:', proveedorText);
+    console.log('Factura:', nroFactura);
+    console.log('Fecha:', fechaFormateada);
+
+    // Crear ventana de impresión
+    const printWindow = window.open('', '_blank');
+
+    // Escribir el contenido con estilos optimizados para impresión
+    printWindow.document.write(`
+    <html>
+    <head>
+        <title>Impresión de Remito ${nroRemito}</title>
+        <style>
+            /* Esta es la línea clave para ocultar el encabezado */
+            @page :first {
+                margin-top: 0;
+            }
+            /* Estilos generales */
+            body {
+                font-family: Arial, sans-serif;
+                font-size: 11px; /* Tipografía más pequeña */
+                line-height: 1.3;
+                color: #000;
+                margin: 0;
+                padding: 10px;
+            }
+            
+            /* Estilos de cabecera */
+            .header {
+                margin-bottom: 15px;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 10px;
+            }
+            
+            h1 {
+                font-size: 16px;
+                margin: 0 0 5px 0;
+            }
+            
+            h2 {
+                font-size: 14px;
+                margin: 0 0 5px 0;
+            }
+            
+            .fecha {
+                font-style: italic;
+                margin-bottom: 5px;
+            }
+            
+            /* Estilos para detalles del remito */
+            .remito-detalles {
+                margin-bottom: 15px;
+                padding: 10px;
+                border: 1px solid #ddd;
+                background-color: #f9f9f9;
+            }
+            
+            .remito-detalles table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            
+            .remito-detalles table td {
+                padding: 3px;
+                border: none;
+            }
+            
+            .remito-detalles .label {
+                font-weight: bold;
+                width: 120px;
+            }
+            
+            /* Estilos de tabla */
+            table {
+                border-collapse: collapse;
+                width: 100%;
+                margin-bottom: 15px;
+            }
+            
+            th, td {
+                border: 1px solid #ddd;
+                padding: 4px; /* Padding más compacto */
+                text-align: left;
+                font-size: 10px; /* Tipografía aún más pequeña para la tabla */
+            }
+            
+            th {
+                background-color: #f2f2f2;
+                font-weight: bold;
+            }
+            
+            /* Clases para mostrar columnas finales */
+            .toggle-column {
+                display: table-cell !important;
+            }
+            
+            /* Ocultar columna de acciones */
+            th:last-child, td:last-child {
+                display: none;
+            }
+            
+            /* Estilos para datos numéricos */
+            .text-end, .text-right {
+                text-align: right;
+            }
+            
+            /* Estilos para filas especiales */
+            .table-primary, .table-info {
+                font-weight: bold;
+            }
+            
+            .table-primary {
+                background-color: #e6f2ff !important;
+            }
+            
+            .table-info {
+                background-color: #e8f4f8 !important;
+            }
+            
+            /* Pies de página */
+            .footer {
+                margin-top: 20px;
+                font-size: 9px;
+                text-align: center;
+                border-top: 1px solid #ddd;
+                padding-top: 10px;
+            }
+            
+            .company-header {
                 display: flex;
                 flex-direction: row; /* Asegura que los elementos estén en línea */
                 align-items: center; /* Alinea verticalmente en el centro */
                 margin-bottom: 10px;
-                }
+            }
 
-                .logo {
-                    flex: 0 0 auto; /* No permite que el logo se estire */
-                    margin-right: 20px; /* Espacio entre el logo y el texto */
-                }
+            .logo {
+                flex: 0 0 auto; /* No permite que el logo se estire */
+                margin-right: 20px; /* Espacio entre el logo y el texto */
+            }
 
-                .company-info {
-                    flex: 1 1 auto; /* Permite que el texto ocupe el espacio restante */
-                }
-            </style>
-        </head>
-        <body>
-            
-<div class="header">
-    <div class="company-header">
-        <div class="logo">
-            <!-- Aquí puedes incrustar el logo como base64 o usar una URL absoluta -->
-            <!-- Alternativa: usar una URL absoluta -->
-            <img src="http://grupoleonsa.com/wp-content/uploads/2021/07/logo-1.png" alt="Logo Empresa" style="height: 60px; max-width: 200px;">
-        </div>
-        <div class="company-info">
-            <h2 style="margin: 0; font-size: 14px;">Comercial Compras - Grupo León</h2>
-            <p style="margin: 2px 0; font-size: 10px;">Ruta Provincial 39 km 146 – C. del Uruguay – Entre Ríos</p>
-            <p style="margin: 2px 0; font-size: 10px;">Tel: 08004440479 | Email: contacto@grupoleonsa.com</p>
-            <p style="margin: 2px 0; font-size: 10px;">CUIT: 30-12345678-9</p>
-        </div>
-    </div>
-    <div style="border-bottom: 1px solid #ddd; margin: 10px 0;"></div>
-    <h1>Detalle de Remito ${nroRemito}</h1>
-    
-</div>
-            
-            <div class="remito-detalles">
-                <table>
-                    <tr>
-                        <td class="label">Proveedor: <span style="font-weight: normal;">${proveedorText}</span></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td class="label">Nro. de Factura: <span style="font-weight: normal;">${nroFactura}</span></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td class="label">Fecha de Ingreso: <span style="font-weight: normal;">${fechaFormateada}</span></td>
-                        <td></td>
-                    </tr>
-                </table>
+            .company-info {
+                flex: 1 1 auto; /* Permite que el texto ocupe el espacio restante */
+            }
+        </style>
+    </head>
+    <body>
+        
+        <div class="header">
+            <div class="company-header">
+                <div class="logo">
+                    <img src="http://grupoleonsa.com/wp-content/uploads/2021/07/logo-1.png" alt="Logo Empresa" style="height: 60px; max-width: 200px;">
+                </div>
+                <div class="company-info">
+                    <h2 style="margin: 0; font-size: 14px;">Comercial Compras - Grupo León</h2>
+                    <p style="margin: 2px 0; font-size: 10px;">Ruta Provincial 39 km 146 – C. del Uruguay – Entre Ríos</p>
+                    <p style="margin: 2px 0; font-size: 10px;">Tel: 08004440479 | Email: contacto@grupoleonsa.com</p>
+                    <p style="margin: 2px 0; font-size: 10px;">CUIT: 30-12345678-9</p>
+                </div>
             </div>
-            
-            ${tableHTML}
-            
-            <div class="footer">
-                <p>Documento generado por Sistema de Remitos - ${new Date().toLocaleString('es-AR')}</p>
-            </div>
-        </body>
-        </html>
+            <div style="border-bottom: 1px solid #ddd; margin: 10px 0;"></div>
+            <h1>Detalle de Remito ${nroRemito}</h1>
+        </div>
+        
+        <div class="remito-detalles">
+            <table>
+                <tr>
+                    <td class="label">Proveedor: <span style="font-weight: normal;">${proveedorText}</span></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="label">Nro. de Factura: <span style="font-weight: normal;">${nroFactura}</span></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="label">Fecha de Ingreso: <span style="font-weight: normal;">${fechaFormateada}</span></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+        
+        ${tableHTML}
+        
+        <div class="footer">
+            <p>Documento generado por Sistema de Remitos - ${new Date().toLocaleString('es-AR')}</p>
+        </div>
+    </body>
+    </html>
     `);
 
-        printWindow.document.close();
-        printWindow.focus();
+    printWindow.document.close();
+    printWindow.focus();
 
-        // Aplicar clases de visibilidad a las columnas según su estado actual
-        const toggleColumns = document.querySelectorAll('.remitos-datatable .toggle-column');
-        const columnasFinalesVisibles = toggleColumns.length > 0 &&
-            window.getComputedStyle(toggleColumns[0]).display !== 'none';
-
+        // Agregar evento para cerrar la ventana después de imprimir
+        printWindow.addEventListener('afterprint', function() {
+        printWindow.close();
+    });
+    
+    // Aplicar modificaciones a la tabla en la ventana de impresión
+    printWindow.onload = function() {
+        // Asegurar que las columnas finales sean visibles
         const printToggleColumns = printWindow.document.querySelectorAll('.toggle-column');
         printToggleColumns.forEach(col => {
-            if (columnasFinalesVisibles) {
-                col.classList.add('visible');
-                col.style.display = '';
-            } else {
-                col.style.display = 'none';
-            }
+            col.style.display = 'table-cell';
         });
-
-        // Dar tiempo para que se carguen los estilos antes de imprimir
+        
+        // Ocultar columna de acciones (última columna)
+        const actionCells = printWindow.document.querySelectorAll('th:last-child, td:last-child');
+        actionCells.forEach(cell => {
+            cell.style.display = 'none';
+        });
+        
+        // Asegurarse de que la fila de totales y diferencia están visibles
+        const totalRow = printWindow.document.querySelector('.table-primary');
+        const diffRow = printWindow.document.querySelector('.table-info');
+        
+        if (totalRow) {
+            const totalCells = totalRow.querySelectorAll('td');
+            totalCells.forEach(cell => {
+                if (cell.classList.contains('toggle-column')) {
+                    cell.style.display = 'table-cell';
+                }
+            });
+        }
+        
+        if (diffRow) {
+            const diffCells = diffRow.querySelectorAll('td');
+            diffCells.forEach(cell => {
+                cell.style.display = 'table-cell';
+            });
+        }
+        
+        // Dar tiempo para que se apliquen los cambios y luego imprimir
         setTimeout(() => {
             printWindow.print();
-            printWindow.close();
         }, 500);
-    }
-
-    // Para PDF podríamos usar html2pdf.js u otra biblioteca similar
+    };
+}
+    
+// Para PDF podríamos usar html2pdf.js u otra biblioteca similar
     // Esta función requerirá incluir una biblioteca adicional
     function exportTableToPDF() {
         alert('Para exportar a PDF, necesitarás incluir una biblioteca');
@@ -717,7 +745,7 @@
 
             // Actualizar subtotal final si corresponde o si estamos actualizando dólares/pesos
             if ((isRealField || updateBothSubtotals) && data.subtotalFinal !== undefined) {
-                const finalSubtotalCell = row.querySelector('td:nth-child(7)');
+                const finalSubtotalCell = row.querySelector('td:nth-child(8)');
                 if (finalSubtotalCell) {
                     finalSubtotalCell.textContent = parseFloat(data.subtotalFinal).toLocaleString('es-AR', {
                         minimumFractionDigits: 2,
@@ -738,7 +766,7 @@
             }
 
             if (data.totalFinal !== undefined) {
-                const totalFinalElement = document.querySelector('tr.table-primary td:nth-child(7)');
+                const totalFinalElement = document.querySelector('tr.table-primary td:nth-child(8)');
                 if (totalFinalElement) {
                     totalFinalElement.textContent = '$ ' + parseFloat(data.totalFinal).toLocaleString('es-AR', {
                         minimumFractionDigits: 2,
@@ -774,7 +802,7 @@
 
             // Actualizar subtotales según corresponda
             if (isRealField && data.subtotalFinal !== undefined) {
-                const finalSubtotalCell = row.querySelector('td:nth-child(7)');
+                const finalSubtotalCell = row.querySelector('td:nth-child(8)');
                 if (finalSubtotalCell) {
                     finalSubtotalCell.textContent = parseFloat(data.subtotalFinal).toLocaleString('es-AR', {
                         minimumFractionDigits: 2,
@@ -813,7 +841,7 @@
             }
 
             if (data.totalFinal !== undefined) {
-                const totalFinalElement = document.querySelector('tr.table-primary td:nth-child(7)');
+                const totalFinalElement = document.querySelector('tr.table-primary td:nth-child(8)');
                 if (totalFinalElement) {
                     totalFinalElement.textContent = '$ ' + parseFloat(data.totalFinal).toLocaleString('es-AR', {
                         minimumFractionDigits: 2,

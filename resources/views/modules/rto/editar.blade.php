@@ -464,27 +464,7 @@
                 toggleResolucionField();
             });
         }
-
-        // Mostrar/ocultar campo de resolución según el estado
-        // const estadoSelect = document.getElementById('estadoReclamoRto');
-        // if (estadoSelect) {
-        //     estadoSelect.addEventListener('change', toggleResolucionField);
-        // }
-
-        // function toggleResolucionField() {
-        //     const estadoSelect = document.getElementById('estadoReclamoRto');
-        //     const resolucionContainer = document.getElementById('resolucionContainer');
-
-        //     if (!estadoSelect || !resolucionContainer) return;
-
-        //     if (estadoSelect.value === 'resuelto') {
-        //         resolucionContainer.style.display = 'block';
-        //         document.getElementById('resolucionReclamoRto').setAttribute('required', 'required');
-        //     } else {
-        //         resolucionContainer.style.display = 'none';
-        //         document.getElementById('resolucionReclamoRto').removeAttribute('required');
-        //     }
-        // }
+        
     </script>
 
 @endsection

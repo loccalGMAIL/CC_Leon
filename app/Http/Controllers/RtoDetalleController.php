@@ -52,6 +52,7 @@ class RtoDetalleController extends Controller
                 'valorPesosRtoTeorico' => $request->valorPesosRtoTeorico ?? 0,
                 'TC_RtoTeorico' => $request->TC_RtoTeorico ?? 0,
                 'subTotalRtoTeorico' => $subtotal,
+                'valorPesosRtoReal' => $request->valorPesosRtoTeorico ?? 0,
                 'TC_RtoReal' => $request->TC_RtoTeorico ?? 0,
                 'subTotalRtoReal' => $subtotal
             ]);
@@ -97,7 +98,7 @@ class RtoDetalleController extends Controller
             $value = $request->input('value');
 
             // Validar datos
-            if (!in_array($field, ['valorDolaresRtoTeorico', 'valorPesosRtoTeorico', 'TC_RtoTeorico', 'totalFinalRto', 'valorDolaresRtoReal', 'TC_RtoReal'])) {
+            if (!in_array($field, ['valorDolaresRtoTeorico', 'valorPesosRtoTeorico', 'TC_RtoTeorico', 'totalFinalRto', 'valorPesosRtoReal','valorDolaresRtoReal', 'TC_RtoReal'])) {
                 return response()->json(['success' => false, 'message' => 'Campo no válido']);
             }
 
@@ -141,8 +142,8 @@ class RtoDetalleController extends Controller
                 $detalle->subTotalRtoReal = $detalle->valorDolaresRtoTeorico * $detalle->TC_RtoReal;
             } else {
                 // En otros casos, mantenemos la lógica anterior
-                if ($detalle->valorPesosRtoTeorico > 0) {
-                    $detalle->subTotalRtoReal = $detalle->valorPesosRtoTeorico;
+                if ($detalle->valorPesosRtoReal > 0) {
+                    $detalle->subTotalRtoReal = $detalle->valorPesosRtoReal;
                 } elseif ($detalle->valorDolaresRtoTeorico > 0 && $detalle->TC_RtoReal > 0) {
                     $detalle->subTotalRtoReal = $detalle->valorDolaresRtoTeorico * $detalle->TC_RtoReal;
                 } else {
@@ -193,7 +194,7 @@ class RtoDetalleController extends Controller
         try {
             $detalle = RtoDetalle::findOrFail($id);
 
-            if (!in_array($field, ['valorDolaresRtoTeorico', 'valorPesosRtoTeorico', 'TC_RtoTeorico', 'subTotalRtoTeorico', 'TC_RtoReal', 'subTotalRtoReal'])) {
+            if (!in_array($field, ['valorDolaresRtoTeorico', 'valorPesosRtoTeorico', 'TC_RtoTeorico', 'subTotalRtoTeorico', 'valorPesosRtoReal','TC_RtoReal', 'subTotalRtoReal'])) {
                 return response()->json(['success' => false, 'message' => 'Campo no válido']);
             }
 

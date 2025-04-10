@@ -19,6 +19,7 @@ return new class extends Migration
             $table->decimal('valorPesosRtoTeorico', 10, 2)->nullable();
             $table->decimal('TC_RtoTeorico', 10, 2)->nullable();
             $table->decimal('subTotalRtoTeorico', 10, 2);
+            $table->decimal('valorPesosRtoReal', 10, 2)->nullable();
             $table->decimal('TC_RtoReal', 10, 2)->nullable();
             $table->decimal('subTotalRtoReal', 10, 2)->nullable();          
             $table->timestamps();

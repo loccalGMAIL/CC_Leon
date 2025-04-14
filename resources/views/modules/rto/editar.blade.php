@@ -23,7 +23,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Detalle de Remito Nro:
-                                {{ str_pad($items->proveedores_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($items->camion, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($items->id, 6, '0', STR_PAD_LEFT) }}
+                                {{ str_pad($items->camion, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($items->proveedores_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($items->id, 6, '0', STR_PAD_LEFT) }}
                             </h5>
 
                             <!-- Botón para mostrar/ocultar detalles del remito -->
@@ -47,8 +47,9 @@
                                         <input type="text" class="form-control" id="nroFacturaRto" name="nroFacturaRto"
                                             value="{{$items->nroFacturaRto}}" required>
                                     </div>
+                                    
                                 </div>
-
+                        
                                 <div class="row g-3 mb-4">
                                     <div class="col-md-6">
                                         <div class="d-flex">
@@ -71,10 +72,16 @@
                                                 </button>
                                             </div>
                                         </div>
+                                        <div class="col-md-6">
+                                            <div class="d-flex justify-content-end mt-2">
+                                                <button type="button" id="guardarCambiosRemito" class="btn btn-primary">
+                                                    <i class="fa-solid fa-save"></i> Guardar cambios
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
-
-
                                 </div>
+                                
                                 {{-- Fin Columnas --}}
                             </div>
 

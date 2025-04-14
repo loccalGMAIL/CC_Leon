@@ -19,7 +19,12 @@
         <div class="card-body">
         <h5 class="card-title">Administrar Usuarios</h5>
         <p class="card-text">En esta sección podrá administrar las cuentas y roles de usuarios.</p>
-
+        @if(session('success'))
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    @endif
         <a href="{{route('usuarios.create')}}" class="btn btn-primary mt-3 mb-3">
           <i class="fa-solid fa-circle-plus"> </i> Agregar nuevo Usuario
         </a>
@@ -40,9 +45,6 @@
           <td>{{$item->name}}</td>
           <td>{{$item->email}}</td>
           <td>{{$item->rol}}</td>
-          {{-- <td>
-          <a href="#" class="btn btn-gray bt-sm"><i class="fa-solid fa-user-lock"></i></a>
-          </td> --}}
           <td>{!! $item->activo ? '<div class="form-check form-switch text-center">
         <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked>
         </div>' :
@@ -50,8 +52,8 @@
         <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
         </div>' !!}</td>
           <td>
-          <a href="{{route('usuarios.edit',$item->id)}}" class="btn btn-warning bt-sm"><i class="fa-solid fa-user-pen"></i></a>
-          <a href="#" class="btn btn-danger bt-sm"><i class="fa-solid fa-user-gear"></i></a>
+          <a href="{{route('usuarios.edit',$item->id)}}" class="btn btn-success btn-sm"><i class="fa-solid fa-pen-to-square"></i></a>
+          <a href="#" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash-can"></i></a>
           </td>
           </tr>
       @endforeach

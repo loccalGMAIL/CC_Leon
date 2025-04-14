@@ -9,7 +9,7 @@
             <th class="text-center columna-final toggle-column" style="display: none;">Pesos Final</th>
             <th class="text-center columna-final toggle-column" style="display: none;">T.C. Final</th>
             <th class="text-center columna-final toggle-column" style="display: none;">SubTotal Final</th>
-            <th class="text-center">Acciones</th>
+            <th class="text-center"></th>
         </tr>
     </thead>
     <tbody>
@@ -58,7 +58,7 @@
                     </td>
                     <td>
                         <a href="#" class="badge bg-danger eliminar-elemento"
-                            data-id="{{ $detalle->id }}"><span>Eliminar</span></a>
+                            data-id="{{ $detalle->id }}"><i class="fa-solid fa-trash-can"></i></a>
                     </td>
                 </tr>
         @endforeach
@@ -686,36 +686,53 @@
         formData.append('value', newValue);
         formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
 
-        // Enviar actualización al servidor
-        fetch('/remitos/actualizarCampo', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Usar una referencia más estable para la actualización de la UI
-                    const updatedCell = document.querySelector(`[data-id="${cellInfo.id}"][data-field="${cellInfo.field}"]`);
-                    if (updatedCell) {
-                        updateUIWithServerData(updatedCell, data);
-                    } else {
-                        // Si no podemos encontrar la celda original, actualizar por selección directa
-                        updateUIWithoutCell(cellInfo, data);
-                    }
-
-                    // Aplicar restricciones de edición después de actualizar la UI
-                    setTimeout(aplicarRestriccionesEdicion, 100);
-                } else {
-                    handleServerError(data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                handleServerError(error.message);
+// Enviar actualización al servidor
+fetch('/remitos/actualizarCampo', {
+    method: 'POST',
+    body: formData,
+    headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Accept': 'application/json' // Añadir esta línea
+    }
+})
+    .then(response => {
+        // Verificar si la respuesta es exitosa
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        // Verificar que la respuesta es realmente JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            // Si no es JSON, intenta obtener el texto para ver el error
+            return response.text().then(text => {
+                console.error('Respuesta no JSON:', text);
+                throw new TypeError("La respuesta no es JSON");
             });
+        }
+        
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Usar una referencia más estable para la actualización de la UI
+            const updatedCell = document.querySelector(`[data-id="${cellInfo.id}"][data-field="${cellInfo.field}"]`);
+            if (updatedCell) {
+                updateUIWithServerData(updatedCell, data);
+            } else {
+                // Si no podemos encontrar la celda original, actualizar por selección directa
+                updateUIWithoutCell(cellInfo, data);
+            }
+            // Aplicar restricciones de edición después de actualizar la UI
+            setTimeout(aplicarRestriccionesEdicion, 100);
+        } else {
+            handleServerError(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error completo:', error);
+        handleServerError(error.message || 'Error en la comunicación con el servidor');
+    });
     }
 
     // Función para actualizar la UI con datos del servidor

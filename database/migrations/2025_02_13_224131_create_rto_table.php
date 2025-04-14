@@ -13,7 +13,8 @@ return new class extends Migration
             $table->foreignId('proveedores_id')->constrained('proveedores');
             $table->integer('camion');
             $table->string('nroFacturaRto', 50);
-            $table->date('fechaIngresoRto');            
+            $table->date('fechaIngresoRto');
+            $table->enum('estado', ['Espera', 'Deuda', 'Pagado'])->default('Espera');
             $table->decimal('totalTempRto', 10, 2)->nullable();
             $table->decimal('totalFinalRto', 10, 2)->nullable();
             $table->timestamps();

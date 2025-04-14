@@ -40,6 +40,8 @@ Route::prefix('remitos')->middleware('auth')->group(function () {
     Route::post('actualizarCampo', [RtoDetalleController::class, 'actualizarCampo'])->name('actualizarCampo');
     Route::get('obtenerValor/{id}/{field}', [RtoDetalleController::class, 'obtenerValor'])->name('obtenerValor');
     Route::post('/deleteRtoDetalle/{id}', [RtoDetalleController::class, 'delete'])->name('deleteRtoDetalle');
+    Route::get('pendientes', [RtoController::class, 'pendientes'])->name('remitos.pendientes');
+    Route::post('/actualizarEstado/{id}' , [RtoController::class, 'actualizarEstado'])->name('actualizarEstado');
 });
 
 route::prefix('reclamos')->middleware('auth')->group(function () {

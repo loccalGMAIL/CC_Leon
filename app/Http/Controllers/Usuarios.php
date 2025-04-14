@@ -80,6 +80,8 @@ class Usuarios extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $item = User::findorfail($id);
+        $item->delete();
+        return redirect()->back()->with('success', 'Usuario eliminada correctamente');
     }
 }

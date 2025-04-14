@@ -14,6 +14,10 @@ class Observacion extends Model
 
     public function rto()
     {
-        return $this->belongsTo(Rto::class, 'Rto_id');
+        return $this->belongsTo(rto::class, 'Rto_id');
+    }
+    public function proveedor()
+    {
+        return $this->belongsTo(Proveedor::class, 'Rto_id');
     }
 }

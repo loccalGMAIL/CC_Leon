@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 Use App\Models\Reclamo;
-use App\Models\Rto;
+use App\Models\rto;
 
 class Reclamos extends Controller
 {

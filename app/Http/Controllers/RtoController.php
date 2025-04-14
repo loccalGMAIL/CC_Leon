@@ -135,12 +135,37 @@ class RtoController extends Controller
             ->with('success', 'Remito actualizado correctamente');
     }
 
-    public function destroy($id)
+    public function pendientes()
     {
-        $remito = Rto::findOrFail($id);
-        $remito->delete();
+        $titulo = 'Remitos Pendientes';
+        $proveedores = Proveedor::where('estadoProveedor', '1')->get();
 
-        return redirect()->route('remitos')
-            ->with('success', 'Remito eliminado correctamente');
+
+        // Si tienes un campo 'estado' en la tabla
+        $items = rto::where('estado', 'Espera')
+        ->with(['proveedor'])
+        ->withCount('observaciones', 'reclamos')
+        ->orderBy('fechaIngresoRto', 'desc')
+        ->get();
+        // Si infieres el estado a partir de otros campos
+        // $remitosPendientes = Rto::whereNull('totalFinalRto')
+        //                       ->with(['proveedor', 'camion'])
+        //                       ->orderBy('fechaIngresoRto', 'desc')
+        //                       ->get();
+        
+        return view('modules.rto.pendientes', compact('items', 'titulo', 'proveedores'));
+    }
+
+    public function actualizarEstado(Request $request, $id)
+    {
+        $request->validate([
+            'estado' => 'required|in:Espera,Deuda,Pagado,Anulado'
+        ]);
+        
+        $remito = rto::findOrFail($id);
+        $remito->estado = $request->estado;
+        $remito->save();
+        
+        return response()->json(['success' => true]);
     }
 }

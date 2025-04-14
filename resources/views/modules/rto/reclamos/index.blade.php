@@ -21,7 +21,7 @@
             <div class="card-body">
               @if(isset($remito))
                 <h5 class="card-title">
-                  Reclamos del Remito #{{ str_pad($remito->proveedores_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($remito->camion, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($remito->id, 6, '0', STR_PAD_LEFT) }}
+                  Reclamos del Remito #{{ str_pad($remito->camion, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($remito->proveedores_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($remito->id, 6, '0', STR_PAD_LEFT) }}
                 </h5>
                 <p>Proveedor: {{ $remito->proveedor->razonSocialProveedor }}</p>
                 <p>Factura: {{ $remito->nroFacturaRto }}</p>

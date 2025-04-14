@@ -34,6 +34,7 @@
             <th class="text-center">Reclamos</th>
             <th class="text-center">Ingreso</th>
             <th class="text-center">Actualiación</th>
+            <th class="text-center">Estado</th>
             <th class="text-center">Acciones</th>
           </tr>
           </thead>
@@ -41,14 +42,31 @@
           @foreach ($items as $item)
         <tr class="text-center">
         <td>
-        {{ str_pad($item->proveedores_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($item->camion, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($item->id, 6, '0', STR_PAD_LEFT) }}
+        {{ str_pad($item->camion, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($item->proveedores_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($item->id, 6, '0', STR_PAD_LEFT) }}
         </td>
         <td>{{ $item->proveedor->razonSocialProveedor ?? 'Sin proveedor' }}</td>
         <td>{{$item->nroFacturaRto}}</td>
         <td>{{ $item->observaciones_count ?? 0 }}</td>
         <td>{{ $item->reclamos_count ?? 0 }}</td>
         <td>{{ \Carbon\Carbon::parse($item->fechaIngresoRto)->format('d/m/Y') }}</td>
-        <td>{{ \Carbon\Carbon::parse($item->updated_at)->format('d/m/Y H:i') }}</td>
+        <td>{{ \Carbon\Carbon::parse($item->updated_at)->format('d/m/Y') }}</td>
+        <td>
+        <div class="dropdown">
+          <span id="badge-estado-{{ $item->id }}"
+          class="badge estado-badge {{ $item->estado == 'Espera' ? 'bg-info' : ($item->estado == 'Deuda' ? 'bg-danger' : ($item->estado == 'Pagado' ? 'bg-success' : 'bg-danger')) }}"
+          data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
+          {{ $item->estado }}
+          </span>
+          <ul class="dropdown-menu" aria-labelledby="badge-estado-{{ $item->id }}">
+          <li><a class="dropdown-item cambiar-estado" href="#" data-id="{{ $item->id }}"
+          data-estado="Espera">Espera</a></li>
+          <li><a class="dropdown-item cambiar-estado" href="#" data-id="{{ $item->id }}"
+          data-estado="Deuda">Deuda</a></li>
+          <li><a class="dropdown-item cambiar-estado" href="#" data-id="{{ $item->id }}"
+          data-estado="Pagado">Pagado</a></li>
+          </ul>
+        </div>
+        </td>
         <td class="d-flex justify-content-center gap-2">
         <a href="{{ route('remitos.edit', $item->id) }}" class="badge bg-success" title="Editar">
           <i class="fa-solid fa-pen-to-square"></i>
@@ -71,184 +89,100 @@
       </div>
 
       </div>
+      <!-- Modal remito -->
+      @include('modules.rto.modalNvoRto')
+      <!-- End Table with stripped rows -->
     </div>
 
-    <!-- Modal para agregar remito -->
-    <div class="modal fade" id="agregarRemitoModal" tabindex="-1" aria-labelledby="agregarRemitoModalLabel"
-      aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-        <h5 class="modal-title" id="agregarRemitoModalLabel">Agregar Nuevo Remito</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-        <form id="nuevoRemitoForm" method="POST" action="{{ route('remitos.store') }}">
-          @csrf
-          <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="fechaIngresoRto" class="form-label">Fecha</label>
-            <input type="date" class="form-control" id="fechaIngresoRto" name="fechaIngresoRto" required
-            value="{{ date('Y-m-d') }}">
-          </div>
-          <div class="col-md-6">
-            <label for="nroFacturaRto" class="form-label">Nro. de Factura</label>
-            <input type="text" class="form-control" id="nroFacturaRto" name="nroFacturaRto" required>
-          </div>
-          </div>
 
-          <div class="row mb-3">
-          <div class="col-md-12">
-            <div class="d-flex">
-            <div class="flex-grow-1">
-              <label for="idProveedor" class="form-label">Proveedor</label>
-              <select class="form-select" id="idProveedor" name="idProveedor" required>
-              <option value="">Seleccionar proveedor</option>
-              @foreach($proveedores as $proveedor)
-          <option value="{{ $proveedor->id }}">
-          {{ $proveedor->razonSocialProveedor }} ({{ $proveedor->nombreProveedor }})
-          </option>
-        @endforeach
-              </select>
-            </div>
-            <div class="ms-2 d-flex align-items-end">
-              <button type="button" class="btn btn-success" data-bs-toggle="modal"
-              data-bs-target="#agregarProveedorModal">
-              <i class="fa-solid fa-plus"></i>
-              </button>
-            </div>
-            </div>
-          </div>
-          </div>
-
-        </form>
-        </div>
-        <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button type="submit" form="nuevoRemitoForm" class="btn btn-primary">Crear</button>
-        </div>
-      </div>
-      </div>
-    </div>
-
-    <!-- Modal para agregar proveedor -->
-    <div class="modal fade" id="agregarProveedorModal" tabindex="-1" aria-labelledby="agregarProveedorModalLabel"
-      aria-hidden="true">
-      <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-        <h5 class="modal-title" id="agregarProveedorModalLabel">Agregar Nuevo Proveedor</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-        <form id="nuevoProveedorForm" method="POST" action="{{ route('proveedores.store') }}">
-          @csrf
-          <div class="mb-3">
-          <label for="nombreProveedor" class="form-label">Nombre del proveedor *</label>
-          <input type="text" class="form-control" id="nombreProveedor" name="nombreProveedor" required>
-          </div>
-          <div class="mb-3">
-          <label for="dniProveedor" class="form-label">DNI</label>
-          <input type="text" class="form-control" id="dniProveedor" name="dniProveedor">
-          </div>
-          <div class="mb-3">
-          <label for="razonSocialProveedor" class="form-label">Razón Social *</label>
-          <input type="text" class="form-control" id="razonSocialProveedor" name="razonSocialProveedor" required>
-          </div>
-          <div class="mb-3">
-          <label for="cuitProveedor" class="form-label">CUIT *</label>
-          <input type="text" class="form-control" id="cuitProveedor" name="cuitProveedor" required>
-          </div>
-          <div class="mb-3">
-          <label for="telefonoProveedor" class="form-label">Teléfono</label>
-          <input type="text" class="form-control" id="telefonoProveedor" name="telefonoProveedor">
-          </div>
-          <div class="mb-3">
-          <label for="mailProveedor" class="form-label">Email</label>
-          <input type="email" class="form-control" id="mailProveedor" name="mailProveedor">
-          </div>
-          <div class="mb-3">
-          <label for="direccionProveedor" class="form-label">Dirección</label>
-          <input type="text" class="form-control" id="direccionProveedor" name="direccionProveedor">
-          </div>
-
-        </form>
-        </div>
-        <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button type="submit" form="nuevoProveedorForm" class="btn btn-primary">Guardar</button>
-        </div>
-      </div>
-      </div>
-    </div>
-    </section>
 
   </main>
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-    // Referencias a elementos del DOM
-    const proveedorSelect = document.getElementById('idProveedor');
+    // Seleccionar todos los elementos con clase 'cambiar-estado'
+    const cambiarEstadoLinks = document.querySelectorAll('.cambiar-estado');
 
-    // Manejar cierre de modal de proveedor y actualizar lista
-    const agregarProveedorModal = document.getElementById('agregarProveedorModal');
-    agregarProveedorModal.addEventListener('hidden.bs.modal', function () {
-      // Aquí podríamos recargar la lista de proveedores si se agregó uno nuevo
-    });
-
-    // Envío de formulario de proveedor con AJAX
-    const nuevoProveedorForm = document.getElementById('nuevoProveedorForm');
-    nuevoProveedorForm.addEventListener('submit', function (e) {
+    // Agregar event listener a cada enlace
+    cambiarEstadoLinks.forEach(link => {
+      link.addEventListener('click', function (e) {
       e.preventDefault();
 
-      // Crear FormData con los datos del formulario
-      const formData = new FormData(this);
+      const id = this.dataset.id;
+      const nuevoEstado = this.dataset.estado;
+      const badgeElement = document.getElementById(`badge-estado-${id}`);
 
-      // Enviar datos con fetch
-      fetch(this.action, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      // Guardar estado original en caso de error
+      const estadoOriginal = badgeElement.textContent.trim();
+      const claseOriginal = Array.from(badgeElement.classList).find(clase => clase.startsWith('bg-'));
+
+      // Actualizar visualmente (optimistic UI)
+      badgeElement.textContent = nuevoEstado;
+      badgeElement.classList.remove('bg-info', 'bg-danger', 'bg-success');
+
+      if (nuevoEstado === 'Espera') {
+        badgeElement.classList.add('bg-info');
+      } else if (nuevoEstado === 'Deuda') {
+        badgeElement.classList.add('bg-danger');
+      } else if (nuevoEstado === 'Pagado') {
+        badgeElement.classList.add('bg-success');
+      } else {
+        badgeElement.classList.add('bg-danger');
       }
+
+      // Mostrar indicador de carga (opcional)
+      badgeElement.classList.add('opacity-75');
+
+      // Crear el objeto FormData para enviar los datos
+      const formData = new FormData();
+      formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+      formData.append('estado', nuevoEstado);
+      formData.append('_method', 'POST');
+
+      // Realizar la solicitud Fetch
+      fetch(`/remitos/actualizarEstado/${id}`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+        }
       })
-      .then(response => {
+        .then(response => {
         if (!response.ok) {
-        throw new Error('Error en la respuesta del servidor');
+          throw new Error(`Error HTTP: ${response.status}`);
         }
         return response.json();
-      })
-      .then(data => {
-        if (data.success) {
-        // Cerrar modal
-        const modal = bootstrap.Modal.getInstance(agregarProveedorModal);
-        modal.hide();
+        })
+        .then(data => {
+        // Quitar indicador de carga
+        badgeElement.classList.remove('opacity-75');
 
-        // Agregar el nuevo proveedor al select
-        const option = document.createElement('option');
-        option.value = data.proveedor.id;
-        option.textContent = `${data.proveedor.razonSocialProveedor} (${data.proveedor.nombreProveedor})`;
-        proveedorSelect.appendChild(option);
+        })
+        .catch(error => {
+        console.error('Error al actualizar el estado:', error);
 
-        // Seleccionar el nuevo proveedor
-        proveedorSelect.value = data.proveedor.id;
-
-        // Mostrar notificación de éxito
-        alert('Proveedor agregado correctamente');
-        } else {
-        // Mostrar errores
-        alert('Error al agregar proveedor: ' + (data.message || 'Error desconocido'));
+        // Revertir cambios visuales en caso de error
+        badgeElement.textContent = estadoOriginal;
+        badgeElement.classList.remove('bg-info', 'bg-danger', 'bg-success', 'opacity-75');
+        if (claseOriginal) {
+          badgeElement.classList.add(claseOriginal);
         }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error en el servidor: ' + error.message);
+
+        // Mostrar error
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo actualizar el estado'
+          });
+        } else {
+          alert('No se pudo actualizar el estado');
+        }
+        });
       });
     });
-
     });
-
   </script>
+
 
 @endsection

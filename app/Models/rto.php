@@ -13,6 +13,7 @@ class rto extends Model
         'camion',
         'nroFacturaRto',
         'fechaIngresoRto',
+        'estado',
         'totalTempRto',
         'totalFinalRto',
     ];

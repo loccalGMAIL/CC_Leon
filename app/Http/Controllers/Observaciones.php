@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Observacion;
-use App\Models\Rto;
+use App\Models\rto;
 
 class Observaciones extends Controller
 {
@@ -50,7 +50,7 @@ class Observaciones extends Controller
      */
     public function show(string $id)
     {
-        $remito = Rto::with('proveedor')->findOrFail($id);
+        $remito = rto::with('proveedor')->findOrFail($id);
         $items = Observacion::with('proveedor')
             ->where('Rto_id', $id)
             ->get();

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\RtoDetalle;
 use App\Models\ElementoRto;
-use App\Models\Rto;
+use App\Models\rto;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Validator;
@@ -83,7 +83,7 @@ class RtoDetalleController extends Controller
         $totalFinal = RtoDetalle::where('rto_id', $rtoId)
             ->sum('subTotalRtoReal');
 
-        Rto::where('id', $rtoId)
+        rto::where('id', $rtoId)
             ->update([
                 'totalTempRto' => $totalTeorico,
                 'totalFinalRto' => $totalFinal
@@ -96,23 +96,22 @@ class RtoDetalleController extends Controller
             $id = $request->input('id');
             $field = $request->input('field');
             $value = $request->input('value');
-
+    
             // Validar datos
             if (!in_array($field, ['valorDolaresRtoTeorico', 'valorPesosRtoTeorico', 'TC_RtoTeorico', 'totalFinalRto', 'valorPesosRtoReal','valorDolaresRtoReal', 'TC_RtoReal'])) {
                 return response()->json(['success' => false, 'message' => 'Campo no válido']);
             }
-
+    
             if ($field === 'totalFinalRto') {
                 // Si es el total final, actualizar directamente en la tabla Rto
                 $rto = Rto::findOrFail($id);
                 $rto->totalFinalRto = $value;
                 $rto->save();
-
+    
                 $totalTeorico = $rto->totalTempRto;
                 $totalFinal = $value;
-                // $diferencia = $totalFinal - $totalTeorico;
                 $diferencia = $totalTeorico - $totalFinal;
-
+    
                 return response()->json([
                     'success' => true,
                     'totalTeorico' => $totalTeorico,
@@ -120,13 +119,23 @@ class RtoDetalleController extends Controller
                     'diferencia' => $diferencia
                 ]);
             }
-
+    
             // Si no es el total final, continuar con la lógica existente para otros campos
             $detalle = RtoDetalle::findOrFail($id);
-
+    
             // Actualizar el campo
             $detalle->$field = $value ?? 0;
-
+    
+            // IMPORTANTE: Mover este bloque de código aquí antes de los cálculos
+            if (in_array($field, ['valorDolaresRtoTeorico', 'valorPesosRtoTeorico'])) {
+                // Si se actualiza el valor en dólares o pesos, recalcular el subtotal final también
+                if ($field === 'valorDolaresRtoTeorico' && $detalle->TC_RtoReal > 0) {
+                    $detalle->subTotalRtoReal = $value * $detalle->TC_RtoReal;
+                } elseif ($field === 'valorPesosRtoTeorico') {
+                    $detalle->subTotalRtoReal = $value;
+                }
+            }
+    
             // Calcular el subtotal teórico
             if ($detalle->valorPesosRtoTeorico > 0) {
                 $detalle->subTotalRtoTeorico = $detalle->valorPesosRtoTeorico;
@@ -135,7 +144,7 @@ class RtoDetalleController extends Controller
             } else {
                 $detalle->subTotalRtoTeorico = 0;
             }
-
+    
             // Calcular el subtotal final
             if ($field === 'TC_RtoReal' && $detalle->valorDolaresRtoTeorico > 0) {
                 // Si estamos modificando el TC_RtoReal, calculamos el subtotal con ese valor
@@ -150,22 +159,22 @@ class RtoDetalleController extends Controller
                     $detalle->subTotalRtoReal = 0;
                 }
             }
-
+    
             $detalle->save();
-
+    
             // Recalcular totales
             $rtoId = $detalle->rto_id;
             $totalTeorico = RtoDetalle::where('rto_id', $rtoId)->sum('subTotalRtoTeorico');
             $totalFinal = RtoDetalle::where('rto_id', $rtoId)->sum('subTotalRtoReal');
-
+    
             $diferencia = $totalFinal - $totalTeorico;
-
+    
             // Actualizar el remito principal
             $rto = Rto::find($rtoId);
             $rto->totalTempRto = $totalTeorico;
             $rto->totalFinalRto = $totalFinal;
             $rto->save();
-
+    
             return response()->json([
                 'success' => true,
                 'subtotal' => $detalle->subTotalRtoTeorico,
@@ -177,15 +186,6 @@ class RtoDetalleController extends Controller
             ]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
-        }
-
-        if (in_array($field, ['valorDolaresRtoTeorico', 'valorPesosRtoTeorico'])) {
-            // Si se actualiza el valor en dólares o pesos, recalcular el subtotal final también
-            if ($field === 'valorDolaresRtoTeorico' && $detalle->TC_RtoReal > 0) {
-                $detalle->subTotalRtoReal = $value * $detalle->TC_RtoReal;
-            } elseif ($field === 'valorPesosRtoTeorico') {
-                $detalle->subTotalRtoReal = $value;
-            }
         }
     }
 

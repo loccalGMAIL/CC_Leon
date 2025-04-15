@@ -45,45 +45,32 @@
                                     <div class="col-md-6">
                                         <label for="nroFacturaRto" class="form-label">Nro. de Factura</label>
                                         <input type="text" class="form-control" id="nroFacturaRto" name="nroFacturaRto"
-                                            value="{{$items->nroFacturaRto}}" required>
+                                            value="{{ $items->nroFacturaRto }}" required>
                                     </div>
-                                    
                                 </div>
-                        
+                            
                                 <div class="row g-3 mb-4">
                                     <div class="col-md-6">
-                                        <div class="d-flex">
-                                            <div class="flex-grow-1">
-                                                <label for="idProveedor" class="form-label">Proveedor</label>
-                                                <select class="form-select" id="idProveedor" name="idProveedor" required>
-                                                    <option value="">Seleccionar proveedor</option>
-                                                    @foreach($proveedores as $proveedor)
-                                                        <option value="{{ $proveedor->id }}" {{ $items->proveedores_id == $proveedor->id ? 'selected' : '' }}>
-                                                            {{ $proveedor->razonSocialProveedor }}
-                                                            ({{ $proveedor->nombreProveedor }})
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="ms-2 d-flex align-items-end">
-                                                <button type="button" class="btn btn-success" data-bs-toggle="modal"
-                                                    data-bs-target="#agregarProveedorModal">
-                                                    <i class="fa-solid fa-plus"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="d-flex justify-content-end mt-2">
-                                                <button type="button" id="guardarCambiosRemito" class="btn btn-primary">
-                                                    <i class="fa-solid fa-save"></i> Guardar cambios
-                                                </button>
-                                            </div>
-                                        </div>
+                                        <label for="idProveedor" class="form-label">Proveedor</label>
+                                        <select class="form-select" id="idProveedor" name="idProveedor" required disabled>
+                                            <option value="">Seleccionar proveedor</option>
+                                            @foreach($proveedores as $proveedor)
+                                                <option value="{{ $proveedor->id }}" {{ $items->proveedores_id == $proveedor->id ? 'selected' : '' }}>
+                                                    {{ $proveedor->razonSocialProveedor }} ({{ $proveedor->nombreProveedor }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                            
+                                    <div class="col-md-6 d-flex align-items-end justify-content-end">
+                                        <button type="button" id="guardarCambiosRemito" class="btn btn-primary">
+                                            <i class="fa-solid fa-save"></i> Guardar cambios
+                                        </button>
                                     </div>
                                 </div>
-                                
                                 {{-- Fin Columnas --}}
                             </div>
+                            
 
 
                             <div class="d-flex gap-2 mt-3 mb-3">
@@ -472,6 +459,47 @@
             });
         }
         
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const guardarCambiosRemito = document.getElementById('guardarCambiosRemito');
+            const fechaIngresoRto = document.getElementById('fechaIngresoRto');
+            const nroFacturaRto = document.getElementById('nroFacturaRto');
+
+            if (guardarCambiosRemito) {
+                guardarCambiosRemito.addEventListener('click', function () {
+                    // Crear un objeto con los datos a enviar
+                    const data = {
+                        fechaIngresoRto: fechaIngresoRto.value,
+                        nroFacturaRto: nroFacturaRto.value,
+                        _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content') // CSRF token
+                    };
+
+                    // Enviar los datos al servidor
+                    fetch('{{ route("actualizarRemito", $items->id) }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            alert('Cambios guardados correctamente');
+                        } else {
+                            alert('Error al guardar los cambios: ' + (result.message || 'Error desconocido'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error al procesar la solicitud');
+                    });
+                });
+            }
+        });
     </script>
 
 @endsection

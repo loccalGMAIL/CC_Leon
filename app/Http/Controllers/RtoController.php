@@ -20,6 +20,20 @@ class RtoController extends Controller
         return view('modules.rto.index', compact('titulo', 'items', 'proveedores'));
     }
 
+    public function actualizar(Request $request, $id)
+{
+    try {
+        $remito = rto::findOrFail($id);
+        $remito->fechaIngresoRto = $request->input('fechaIngresoRto');
+        $remito->nroFacturaRto = $request->input('nroFacturaRto');
+        $remito->save();
+
+        return response()->json(['success' => true, 'message' => 'Remito actualizado correctamente']);
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+}
+
     public function create()
     {
         $titulo = 'Crear Remito';

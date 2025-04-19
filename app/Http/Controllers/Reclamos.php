@@ -117,11 +117,15 @@ class Reclamos extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        $reclamo = Reclamo::findOrFail($id);
-        $reclamo->delete();
-
-        return redirect()->back()->with('success', 'Reclamo eliminado correctamente');
+        try {
+            $reclamo = Reclamo::findOrFail($id); // Asegúrate de que el modelo sea correcto
+            $reclamo->delete();
+    
+            return response()->json(['success' => true, 'message' => 'Reclamo eliminado correctamente']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error al eliminar el reclamo: ' . $e->getMessage()]);
+        }
     }
 }

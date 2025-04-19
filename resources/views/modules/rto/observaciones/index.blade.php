@@ -7,9 +7,18 @@
     @if(isset($remito))
     <nav>
       <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="{{ route('remitos') }}">Remitos</a></li>
-      <li class="breadcrumb-item active">Observaciones del Remito {{ str_pad($remito->id, 6, '0', STR_PAD_LEFT) }}
-      </li>
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('remitos') }}">Remitos</a></li>
+        <li class="breadcrumb-item active">Observaciones del Remito {{ str_pad($remito->id, 6, '0', STR_PAD_LEFT) }}
+        </li>
+      </ol>
+    </nav>
+    @else
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('remitos') }}">Remitos</a></li>
+        <li class="breadcrumb-item active">Observaciones</li>
       </ol>
     </nav>
   @endif
@@ -73,7 +82,7 @@
         <a href="#" class="badge bg-success" data-bs-toggle="modal"
           data-bs-target="#editarObservacionModal{{ $item->id }}" title="Editar">
           <i class="fa-solid fa-pen-to-square"></i></a>
-        <a href="#" class="badge bg-danger" onclick="confirmarEliminar({{ $item->id }})" title="Eliminar">
+        <a href="#" class="badge bg-danger eliminar-observacion" data-id="{{ $item->id }}" title="Eliminar">
           <i class="fa-solid fa-trash"></i></a>
         </td>
         </tr>
@@ -181,3 +190,81 @@
     </script>
   </main>
 @endsection
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Seleccionar todos los botones de eliminar observación
+            const botonesEliminar = document.querySelectorAll('.eliminar-observacion');
+
+            botonesEliminar.forEach(boton => {
+                boton.addEventListener('click', function (e) {
+                    e.preventDefault(); // Evitar el comportamiento predeterminado del enlace
+
+                    const id = this.dataset.id; // Obtener el ID de la observación
+
+                    // Mostrar confirmación con SweetAlert
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        text: "Esta observación será eliminada permanentemente.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Enviar solicitud AJAX para eliminar la observación
+                            fetch(`/observaciones/destroy/${id}`, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}', // Token CSRF
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                body: JSON.stringify({
+                                    _method: 'DELETE' // Método DELETE
+                                })
+                            })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                if (data.success) {
+                                    // Eliminar la fila de la tabla de manera segura
+                                    const row = boton.closest('tr');
+                                    if (row && row.parentNode) {
+                                        row.parentNode.removeChild(row);
+                                    }
+
+                                    // Mostrar notificación de éxito
+                                    Swal.fire(
+                                        '¡Eliminado!',
+                                        data.message,
+                                        'success'
+                                    );
+                                } else {
+                                    Swal.fire(
+                                        'Error',
+                                        data.message || 'No se pudo eliminar la observación.',
+                                        'error'
+                                    );
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                Swal.fire(
+                                    'Error',
+                                    'Ocurrió un error al procesar la solicitud.',
+                                    'error'
+                                );
+                            });
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+@endpush

@@ -92,11 +92,23 @@ class Observaciones extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        $observacion = Observacion::findOrFail($id);
-        $observacion->delete();
+    // public function destroy(string $id)
+    // {
+    //     $observacion = Observacion::findOrFail($id);
+    //     $observacion->delete();
 
-        return redirect()->back()->with('success', 'Observación eliminada correctamente');
+    //     return redirect()->back()->with('success', 'Observación eliminada correctamente');
+    // }
+
+    public function destroy($id)
+    {
+        try {
+            $reclamo = Observacion::findOrFail($id); // Asegúrate de que el modelo sea correcto
+            $reclamo->delete();
+    
+            return response()->json(['success' => true, 'message' => 'Reclamo eliminado correctamente']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error al eliminar el reclamo: ' . $e->getMessage()]);
+        }
     }
 }

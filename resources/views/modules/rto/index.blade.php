@@ -7,9 +7,14 @@
   <main id="main" class="main">
 
     <div class="pagetitle">
-    <h1>Remitos</h1>
-
-    </div><!-- End Page Title -->
+      <h1>Remitos</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+          <li class="breadcrumb-item active">Remitos</li>
+        </ol>
+      </nav>
+    </div>
 
     <section class="section">
     <div class="row">

@@ -7,11 +7,20 @@
             @if (isset($remito))
                 <nav>
                     <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('remitos') }}">Remitos</a></li>
                         <li class="breadcrumb-item active">Reclamos del Remito
                             {{ str_pad($remito->id, 6, '0', STR_PAD_LEFT) }}</li>
                     </ol>
                 </nav>
+            @else
+            <nav>
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+                  <li class="breadcrumb-item"><a href="{{ route('remitos') }}">Remitos</a></li>
+                  <li class="breadcrumb-item active">Reclamos</li>
+                </ol>
+              </nav>
             @endif
         </div><!-- End Page Title -->
 

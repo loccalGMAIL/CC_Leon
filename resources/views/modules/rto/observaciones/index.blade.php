@@ -7,9 +7,18 @@
     @if(isset($remito))
     <nav>
       <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="{{ route('remitos') }}">Remitos</a></li>
-      <li class="breadcrumb-item active">Observaciones del Remito {{ str_pad($remito->id, 6, '0', STR_PAD_LEFT) }}
-      </li>
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('remitos') }}">Remitos</a></li>
+        <li class="breadcrumb-item active">Observaciones del Remito {{ str_pad($remito->id, 6, '0', STR_PAD_LEFT) }}
+        </li>
+      </ol>
+    </nav>
+    @else
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('remitos') }}">Remitos</a></li>
+        <li class="breadcrumb-item active">Observaciones</li>
       </ol>
     </nav>
   @endif

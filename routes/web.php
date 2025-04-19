@@ -11,6 +11,7 @@ use App\Http\Controllers\Usuarios;
 use App\Http\Controllers\Proveedores;
 use App\Http\Controllers\Informes;
 use App\Http\Controllers\RtoDetalleController;
+use App\Models\Proveedor;
 
 // Crear usuario admin (Solo usar una vez)
 // Route::get('/crear-admin',[AuthController::class, 'crearAdmin'])->name('crear-admin');
@@ -29,6 +30,8 @@ Route::prefix('usuarios')->middleware('auth')->group(function () {
     Route::post('/store', [Usuarios::class, 'store'])->name('usuarios.store');
     Route::get('/edit/{id}', [Usuarios::class, 'edit'])->name('usuarios.edit');
     Route::put('/update/{id}', [Usuarios::class, 'update'])->name('usuarios.update');
+    Route::post('/estado/{id}', [Usuarios::class, 'estado'])->name('usuarios.estado');
+    Route::delete('/destroy/{id}', [Usuarios::class, 'destroy'])->name('usuarios.destroy');
 });
 
 Route::prefix('remitos')->middleware('auth')->group(function () {
@@ -50,7 +53,7 @@ route::prefix('reclamos')->middleware('auth')->group(function () {
     Route::post('/reclamos', [Reclamos::class, 'store'])->name('reclamos.store');
     Route::put('/reclamos/{id}', [Reclamos::class, 'update'])->name('reclamos.update');
     Route::get('/show/{rtoId?}', [Reclamos::class, 'show'])->name('reclamos.show');
-    Route::delete('/delete/{id}', [Reclamos::class, 'destroy'])->name('reclamos.destroy');
+    Route::delete('/destroy/{id}', [Reclamos::class, 'destroy'])->name('reclamos.destroy');
 });
 
 route::prefix('observaciones')->middleware('auth')->group(function () {
@@ -58,7 +61,7 @@ route::prefix('observaciones')->middleware('auth')->group(function () {
     Route::post('/store', [Observaciones::class, 'store'])->name('observaciones.store');
     Route::get('/show/{remito}', [Observaciones::class, 'show'])->name('observaciones.show');
     Route::put('/update/{id}', [Observaciones::class, 'update'])->name('observaciones.update');
-    Route::delete('/delete/{id}', [Observaciones::class, 'destroy'])->name('observaciones.destroy');
+    Route::post('/destroy/{id}', [Observaciones::class, 'destroy'])->name('observaciones.destroy');
 });
 
 Route::prefix('proveedores')->middleware('auth')->group(function () {
@@ -67,6 +70,7 @@ Route::prefix('proveedores')->middleware('auth')->group(function () {
     Route::post('/store', [Proveedores::class, 'store'])->name('proveedores.store');
     Route::get('/edit/{id}', [Proveedores::class, 'edit'])->name('proveedores.edit');
     Route::put('/update/{id}', [Proveedores::class, 'update'])->name('proveedores.update');
+    Route::post('/estado/{id}', [Proveedores::class, 'estado'])->name('proveedores.estado');   
 
     Route::get('/camiones', [Proveedores::class, 'indexCamiones'])->name('proveedores.camiones');
     Route::get('/camiones/create', [Proveedores::class, 'createCamiones'])->name('proveedores.camiones.create');

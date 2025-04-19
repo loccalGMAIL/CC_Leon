@@ -50,14 +50,16 @@
           <td>{{$item->direccionProveedor}}</td>
           <td>{{$item->telefonoProveedor}}</td>
           <td>{{$item->mailProveedor}}</td>
-          <td>{!! $item->estadoProveedor ? '<div class="form-check form-switch text-center">
-        <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked>
-        </div>' :
-      '<div class="form-check form-switch text-center">
-        <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
-        </div>' !!}</td>
           <td>
-          <a href="{{route('proveedores.edit', $item->id)}}" class="btn btn-warning bt-sm"><i class="fa-solid fa-user-pen"></i></a>
+            <div class="form-check form-switch text-center">
+                <input class="form-check-input cambiar-estado" type="checkbox" 
+                    id="estadoProveedor{{ $item->id }}" 
+                    data-id="{{ $item->id }}" 
+                    {{ $item->estadoProveedor == 1 ? 'checked' : '' }}>
+            </div>
+          </td>
+          <td>
+          <a href="{{route('proveedores.edit', $item->id)}}" class="btn btn-success btn-sm"><i class="fa-solid fa-pen-to-square"></i></a>
           </td>
           </tr>
       @endforeach
@@ -74,3 +76,40 @@
   </main>
 
 @endsection
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            $('.cambiar-estado').on("change", function() {
+                let id = $(this).data("id"); // Obtener el ID del proveedor
+                let estado = $(this).is(":checked") ? 1 : 0; // Determinar el nuevo estado
+
+                // Enviar solicitud AJAX al servidor
+                $.ajax({
+                    url: `/proveedores/estado/${id}`, // Ruta para cambiar el estado
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}', // Token CSRF
+                        estadoProveedor: estado // Nuevo estado
+                    },
+                    success: function(response) {
+                        // Mostrar notificación de éxito con SweetAlert
+                        Swal.fire(
+                            '¡Estado actualizado!',
+                            response.message,
+                            'success'
+                        );
+                    },
+                    error: function(xhr) {
+                        // Mostrar notificación de error con SweetAlert
+                        Swal.fire(
+                            'Error',
+                            'No se pudo actualizar el estado del proveedor.',
+                            'error'
+                        );
+                    }
+                });
+            });
+        });
+    </script>
+@endpush

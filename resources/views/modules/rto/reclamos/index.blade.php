@@ -262,31 +262,12 @@
             </div>
         @endforeach
 
+
+    </main>
+@endsection
+
+@push('scripts')
         <script>
-            // function confirmarEliminar(id) {
-            //   if (confirm('¿Está seguro que desea eliminar este reclamo?')) {
-            //     // Crear un formulario dinámicamente para enviar la solicitud DELETE
-            //     const form = document.createElement('form');
-            //     form.method = 'POST';
-            //     form.action = '{{ url('reclamos/delete') }}/' + id;
-            //     form.style.display = 'none';
-
-            //     const csrfToken = document.createElement('input');
-            //     csrfToken.type = 'hidden';
-            //     csrfToken.name = '_token';
-            //     csrfToken.value = '{{ csrf_token() }}';
-
-            //     const method = document.createElement('input');
-            //     method.type = 'hidden';
-            //     method.name = '_method';
-            //     method.value = 'DELETE';
-
-            //     form.appendChild(csrfToken);
-            //     form.appendChild(method);
-            //     document.body.appendChild(form);
-            //     form.submit();
-            //   }
-            // }
 
             function toggleResolucionField(id) {
                 const isNuevo = id === 'nuevo';
@@ -435,9 +416,7 @@
                         });
                 });
             }
-            });
-        </script>
-        <script>
+            // });
             document.addEventListener('DOMContentLoaded', function () {
                 // Botón para eliminar un reclamo
                 const botonesEliminarReclamo = document.querySelectorAll('.eliminar-reclamo');
@@ -564,5 +543,6 @@
                 }
             });
         </script>
-    </main>
-@endsection
+
+    
+@endpush

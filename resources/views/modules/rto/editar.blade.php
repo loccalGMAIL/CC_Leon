@@ -370,22 +370,32 @@
             const botonesEliminarElemento = document.querySelectorAll('.eliminar-elemento');
             botonesEliminarElemento.forEach(boton => {
                 boton.addEventListener('click', function () {
-                    if (confirm('¿Está seguro de eliminar este elemento?')) {
-                        const id = this.dataset.id;
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        text: "Este elemento será eliminado permanentemente.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const id = this.dataset.id;
 
-                        // Crear FormData para CSRF token
-                        const formData = new FormData();
-                        formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
-                        formData.append('_method', 'POST');
+                            // Crear FormData para CSRF token
+                            const formData = new FormData();
+                            formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+                            formData.append('_method', 'POST');
 
-                        // Enviar solicitud para eliminar
-                        fetch(`/remitos/deleteRtoDetalle/${id}`, {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest'
-                            }
-                        })
+                            // Enviar solicitud para eliminar
+                            fetch(`/remitos/deleteRtoDetalle/${id}`, {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                }
+                            })
                             .then(response => response.json())
                             .then(data => {
                                 if (data.success) {
@@ -396,16 +406,29 @@
                                     }
 
                                     // Mostrar notificación de éxito
-                                    alert('Elemento eliminado correctamente');
+                                    Swal.fire(
+                                        '¡Eliminado!',
+                                        'El elemento ha sido eliminado correctamente.',
+                                        'success'
+                                    );
                                 } else {
-                                    alert('Error al eliminar el elemento: ' + (data.message || 'Error desconocido'));
+                                    Swal.fire(
+                                        'Error',
+                                        'No se pudo eliminar el elemento: ' + (data.message || 'Error desconocido'),
+                                        'error'
+                                    );
                                 }
                             })
                             .catch(error => {
                                 console.error('Error:', error);
-                                alert('Error al procesar la solicitud');
+                                Swal.fire(
+                                    'Error',
+                                    'Ocurrió un error al procesar la solicitud.',
+                                    'error'
+                                );
                             });
-                    }
+                        }
+                    });
                 });
             });
 
@@ -469,33 +492,62 @@
 
             if (guardarCambiosRemito) {
                 guardarCambiosRemito.addEventListener('click', function () {
-                    // Crear un objeto con los datos a enviar
-                    const data = {
-                        fechaIngresoRto: fechaIngresoRto.value,
-                        nroFacturaRto: nroFacturaRto.value,
-                        _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content') // CSRF token
-                    };
+                    // Mostrar alerta de confirmación
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        text: "Se guardarán los cambios realizados.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Sí, guardar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Crear un objeto con los datos a enviar
+                            const data = {
+                                fechaIngresoRto: fechaIngresoRto.value,
+                                nroFacturaRto: nroFacturaRto.value,
+                                _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content') // CSRF token
+                            };
 
-                    // Enviar los datos al servidor
-                    fetch('{{ route("actualizarRemito", $items->id) }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        body: JSON.stringify(data)
-                    })
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.success) {
-                            alert('Cambios guardados correctamente');
-                        } else {
-                            alert('Error al guardar los cambios: ' + (result.message || 'Error desconocido'));
+                            // Enviar los datos al servidor
+                            fetch('{{ route("actualizarRemito", $items->id) }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                body: JSON.stringify(data)
+                            })
+                            .then(response => response.json())
+                            .then(result => {
+                                if (result.success) {
+                                    // Mostrar alerta de éxito
+                                    Swal.fire(
+                                        '¡Guardado!',
+                                        'Los cambios se han guardado correctamente.',
+                                        'success'
+                                    );
+                                } else {
+                                    // Mostrar alerta de error
+                                    Swal.fire(
+                                        'Error',
+                                        'No se pudieron guardar los cambios: ' + (result.message || 'Error desconocido'),
+                                        'error'
+                                    );
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                // Mostrar alerta de error
+                                Swal.fire(
+                                    'Error',
+                                    'Ocurrió un error al procesar la solicitud.',
+                                    'error'
+                                );
+                            });
                         }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Error al procesar la solicitud');
                     });
                 });
             }

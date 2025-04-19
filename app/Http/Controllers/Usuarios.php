@@ -38,8 +38,9 @@ class Usuarios extends Controller
                 'email' => request('email'),
                 'password' => Hash::make(request('password')),
                 'activo' => true,
-                'rol'=> request('rol') 
-            ]);
+                'rol' => request('rol')
+            ]
+        );
         return to_route('usuarios');
     }
 
@@ -80,8 +81,26 @@ class Usuarios extends Controller
      */
     public function destroy(string $id)
     {
-        $item = User::findorfail($id);
-        $item->delete();
-        return redirect()->back()->with('success', 'Usuario eliminada correctamente');
+        try {
+            $item = User::findOrFail($id);
+            $item->delete();
+
+            return response()->json(['success' => true, 'message' => 'Usuario eliminado correctamente']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error al eliminar el usuario']);
+        }
+    }
+
+    public function estado(Request $request, $id)
+    {
+        try {
+            $item = User::findOrFail($id);
+            $item->activo = $request->input('activo'); // Actualizar el estado con el valor recibido
+            $item->save();
+
+            return response()->json(['success' => true, 'message' => 'Estado de usuario actualizado correctamente']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error al actualizar el estado']);
+        }
     }
 }

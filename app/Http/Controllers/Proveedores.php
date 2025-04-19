@@ -141,4 +141,17 @@ class Proveedores extends Controller
         
         return response()->json($camiones);
     }
+
+    public function estado(Request $request, $id)
+    {
+        try {
+            $proveedor = Proveedor::findOrFail($id);
+            $proveedor->estadoProveedor = $request->input('estadoProveedor'); // Actualizar el estado con el valor recibido
+            $proveedor->save();
+
+            return response()->json(['success' => true, 'message' => 'Estado del proveedor actualizado correctamente']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error al actualizar el estado del proveedor']);
+        }
+    }
 }

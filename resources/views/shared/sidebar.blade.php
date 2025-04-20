@@ -9,6 +9,8 @@
         </a>
       </li><!-- End Dashboard Nav -->
 
+@can('ver-todos', )
+    
       <li class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
           <i class="fa-solid fa-file-signature"></i><span>Remitos</span><i class="bi bi-chevron-down ms-auto"></i>
@@ -31,7 +33,9 @@
           </li>
         </ul>
       </li><!-- End Components Nav -->
-
+      @endcan
+      @can('ver-admin')
+          
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{route('proveedores')}}">
           <i class="fa-solid fa-truck-field"></i>
@@ -52,6 +56,7 @@
           <span>Informes</span>
         </a>
       </li><!-- End Error 404 Page Nav -->
+      @endcan
 
     </ul>
 

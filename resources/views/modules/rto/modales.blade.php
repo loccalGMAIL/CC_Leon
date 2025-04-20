@@ -116,7 +116,7 @@
 
                     <div class="mb-3">
                         <label for="TC_RtoTeorico" class="form-label">Tipo de Cambio</label>
-                        <input type="number" step="0.01" class="form-control" id="TC_RtoTeorico" name="TC_RtoTeorico">
+                        <input type="number" step="0.01" class="form-control" id="TC_RtoTeorico" name="TC_RtoTeorico" disabled>
                     </div>
 
                     <div class="modal-footer">
@@ -191,13 +191,6 @@
               </div>
             </div>
             
-            {{-- <div class="row mb-3">
-              <label for="nroRemitoReclamo" class="col-sm-3 col-form-label">Nro. Remito</label>
-              <div class="col-sm-9">
-                <input type="text" class="form-control" id="nroRemitoReclamo" readonly>
-              </div>
-            </div> --}}
-            
             <div class="row mb-3">
               <label for="observaciones" class="col-sm-3 col-form-label">Observación</label>
               <div class="col-sm-9">
@@ -230,3 +223,38 @@
       </div>
     </div>
   </div>
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const valorDolaresInput = document.getElementById('valorDolaresRtoTeorico');
+            const valorPesosInput = document.getElementById('valorPesosRtoTeorico');
+            const tipoCambioInput = document.getElementById('TC_RtoTeorico');
+
+            // Función para manejar cambios en el campo de dólares
+            valorDolaresInput.addEventListener('input', function () {
+                if (this.value.trim() !== '') {
+                    // Si hay un valor en dólares, habilitar tipo de cambio y deshabilitar pesos
+                    tipoCambioInput.disabled = false;
+                    valorPesosInput.disabled = true;
+                } else {
+                    // Si no hay valor en dólares, deshabilitar tipo de cambio y habilitar pesos
+                    tipoCambioInput.disabled = true;
+                    valorPesosInput.disabled = false;
+                }
+            });
+
+            // Función para manejar cambios en el campo de pesos
+            valorPesosInput.addEventListener('input', function () {
+                if (this.value.trim() !== '') {
+                    // Si hay un valor en pesos, deshabilitar dólares y tipo de cambio
+                    valorDolaresInput.disabled = true;
+                    tipoCambioInput.disabled = true;
+                } else {
+                    // Si no hay valor en pesos, habilitar dólares
+                    valorDolaresInput.disabled = false;
+                }
+            });
+        });
+    </script>
+@endpush

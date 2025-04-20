@@ -24,15 +24,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/home', [Dashboard::class, 'index'])->name('home');
 });
 
-Route::prefix('usuarios')->middleware('auth')->group(function () {
-    Route::get('/', [Usuarios::class, 'index'])->name('usuarios');
-    Route::get('/create', [Usuarios::class, 'create'])->name('usuarios.create');
-    Route::post('/store', [Usuarios::class, 'store'])->name('usuarios.store');
-    Route::get('/edit/{id}', [Usuarios::class, 'edit'])->name('usuarios.edit');
-    Route::put('/update/{id}', [Usuarios::class, 'update'])->name('usuarios.update');
-    Route::post('/estado/{id}', [Usuarios::class, 'estado'])->name('usuarios.estado');
-    Route::delete('/destroy/{id}', [Usuarios::class, 'destroy'])->name('usuarios.destroy');
-});
+
 
 Route::prefix('remitos')->middleware('auth')->group(function () {
     Route::get('/', [RtoController::class, 'index'])->name('remitos');
@@ -64,7 +56,17 @@ route::prefix('observaciones')->middleware('auth')->group(function () {
     Route::post('/destroy/{id}', [Observaciones::class, 'destroy'])->name('observaciones.destroy');
 });
 
-Route::prefix('proveedores')->middleware('auth')->group(function () {
+Route::prefix('usuarios')->middleware('auth', 'Checkrol:admin')->group(function () {
+    Route::get('/', [Usuarios::class, 'index'])->name('usuarios');
+    Route::get('/create', [Usuarios::class, 'create'])->name('usuarios.create');
+    Route::post('/store', [Usuarios::class, 'store'])->name('usuarios.store');
+    Route::get('/edit/{id}', [Usuarios::class, 'edit'])->name('usuarios.edit');
+    Route::put('/update/{id}', [Usuarios::class, 'update'])->name('usuarios.update');
+    Route::post('/estado/{id}', [Usuarios::class, 'estado'])->name('usuarios.estado');
+    Route::delete('/destroy/{id}', [Usuarios::class, 'destroy'])->name('usuarios.destroy');
+});
+
+Route::prefix('proveedores')->middleware('auth', 'Checkrol:admin')->group(function () {
     Route::get('/', [Proveedores::class, 'index'])->name('proveedores');
     Route::get('/create', [Proveedores::class, 'create'])->name('proveedores.create');
     Route::post('/store', [Proveedores::class, 'store'])->name('proveedores.store');
@@ -82,6 +84,6 @@ Route::prefix('proveedores')->middleware('auth')->group(function () {
 
 });
 
-Route::prefix('informes')->middleware('auth')->group(function () {
+Route::prefix('informes')->middleware('auth', 'Checkrol:admin')->group(function () {
     Route::get('/', [Informes::class, 'index'])->name('informes');
 });

@@ -56,7 +56,7 @@ route::prefix('observaciones')->middleware('auth')->group(function () {
     Route::post('/destroy/{id}', [Observaciones::class, 'destroy'])->name('observaciones.destroy');
 });
 
-Route::prefix('usuarios')->middleware('auth', 'Checkrol:admin')->group(function () {
+Route::prefix('usuarios')->middleware(['auth', 'Checkrol:admin'])->group(function () {
     Route::get('/', [Usuarios::class, 'index'])->name('usuarios');
     Route::get('/create', [Usuarios::class, 'create'])->name('usuarios.create');
     Route::post('/store', [Usuarios::class, 'store'])->name('usuarios.store');
@@ -66,7 +66,7 @@ Route::prefix('usuarios')->middleware('auth', 'Checkrol:admin')->group(function 
     Route::delete('/destroy/{id}', [Usuarios::class, 'destroy'])->name('usuarios.destroy');
 });
 
-Route::prefix('proveedores')->middleware('auth', 'Checkrol:admin')->group(function () {
+Route::prefix('proveedores')->middleware(['auth', 'Checkrol:admin'])->group(function () {
     Route::get('/', [Proveedores::class, 'index'])->name('proveedores');
     Route::get('/create', [Proveedores::class, 'create'])->name('proveedores.create');
     Route::post('/store', [Proveedores::class, 'store'])->name('proveedores.store');
@@ -84,6 +84,6 @@ Route::prefix('proveedores')->middleware('auth', 'Checkrol:admin')->group(functi
 
 });
 
-Route::prefix('informes')->middleware('auth', 'Checkrol:admin')->group(function () {
+Route::prefix('informes')->middleware(['auth', 'Checkrol:admin'])->group(function () {
     Route::get('/', [Informes::class, 'index'])->name('informes');
 });

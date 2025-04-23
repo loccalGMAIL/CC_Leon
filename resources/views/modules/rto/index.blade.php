@@ -48,7 +48,6 @@
         <tr class="text-center">
         <td>
         {{ str_pad($item->proveedores_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($item->camion, 3, '0', STR_PAD_LEFT) }}
-        {{-- {{ str_pad($item->camion, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($item->proveedores_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($item->id, 6, '0', STR_PAD_LEFT) }} --}}
         </td>
         <td>{{ $item->proveedor->razonSocialProveedor ?? 'Sin proveedor' }}</td>
         <td>{{$item->nroFacturaRto}}</td>

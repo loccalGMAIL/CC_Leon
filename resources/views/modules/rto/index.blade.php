@@ -25,7 +25,7 @@
         <h5 class="card-title">Listado de Remitos</h5>
         <p class="card-text">En esta sección podrá administrar los remitos de los envios.</p>
 
-        <a href="#" class="btn btn-primary mt-3 mb-3" data-bs-toggle="modal" data-bs-target="#agregarRemitoModal">
+        <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#agregarRemitoModal">
           <i class="fa-solid fa-circle-plus"></i> Agregar nuevo remito
         </a>
         <!-- Table with stripped rows -->

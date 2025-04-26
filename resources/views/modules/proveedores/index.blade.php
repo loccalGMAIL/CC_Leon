@@ -25,7 +25,7 @@
         <h5 class="card-title">Administrar los proveedores</h5>
         <p class="card-text">En esta sección podrá administrar las cuentas de los proveedores.</p>
 
-        <a href="{{route('proveedores.create')}}" class="btn btn-primary mt-3 mb-3">
+        <a href="{{route('proveedores.create')}}" class="btn btn-sm btn-primary">
           <i class="fa-solid fa-circle-plus"> </i> Agregar nuevo proveedor
         </a>
         <!-- Table with stripped rows -->

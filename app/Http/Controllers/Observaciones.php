@@ -14,7 +14,10 @@ class Observaciones extends Controller
     public function index()
     {
         $titulo = 'Observaciones';
-        $items = Observacion::all();
+        $items = Observacion::with('rto')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
         return view('modules.rto.observaciones.index', compact('titulo', 'items'));
     }
 

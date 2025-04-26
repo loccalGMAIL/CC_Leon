@@ -24,7 +24,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Detalle de Remito Nro:
-                                {{ str_pad($items->camion, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($items->proveedores_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($items->id, 6, '0', STR_PAD_LEFT) }}
+                                {{ str_pad($items->proveedores_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($items->camion, 3, '0', STR_PAD_LEFT) }}
                             </h5>
 
                             <!-- Botón para mostrar/ocultar detalles del remito -->

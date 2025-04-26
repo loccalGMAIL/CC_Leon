@@ -32,8 +32,8 @@
                                         aria-label="Close"></button>
                                 </div>
                             @endif
-                            <a href="{{ route('usuarios.create') }}" class="btn btn-primary mt-3 mb-3">
-                                <i class="fa-solid fa-circle-plus"> </i> Agregar nuevo Usuario
+                            <a href="{{ route('usuarios.create') }}" class="btn btn-sm btn-primary">
+                                <i class="fa-solid fa-circle-plus"> </i> Agregar nuevo usuario
                             </a>
                             <!-- Table with stripped rows -->
                             <table class="table datatable">

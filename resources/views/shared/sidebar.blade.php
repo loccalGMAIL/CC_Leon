@@ -34,12 +34,19 @@
         </ul>
       </li><!-- End Components Nav -->
       @endcan
-      @can('ver-admin')
+@can('ver-admin')
           
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{route('proveedores')}}">
           <i class="fa-solid fa-truck-field"></i>
           <span>Proveedores</span>
+        </a>
+      </li><!-- End Login Page Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{route('productos')}}">
+          <i class="fa-solid fa-box-open"></i>
+          <span>Productos</span>
         </a>
       </li><!-- End Login Page Nav -->
 

@@ -1,5 +1,9 @@
 @extends('layouts.main')
 
+@section('titulo', $titulo)
+
+@section('contenido')
+
 <main id="main" class="main">
 
     <div class="pagetitle">
@@ -18,3 +22,4 @@
     </section>
 
   </main>
+@endsection

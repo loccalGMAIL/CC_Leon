@@ -32,14 +32,14 @@
         @if(isset($remito))
       <h5 class="card-title">
         Observaciones del Remito
-        #{{ str_pad($remito->proveedores_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($remito->camion, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($remito->id, 6, '0', STR_PAD_LEFT) }}
+        #{{ str_pad($remito->proveedores_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($remito->camion, 3, '0', STR_PAD_LEFT) }}
       </h5>
       <p>Proveedor: {{ $remito->proveedor->razonSocialProveedor }}</p>
       <p>Factura: {{ $remito->nroFacturaRto }}</p>
 
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h5>Lista de Observaciones</h5>
-        <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#agregarObservacionModal">
+        <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#agregarObservacionModal">
         <i class="fa-solid fa-circle-plus"></i> Agregar Observación
         </a>
       </div>
@@ -74,7 +74,7 @@
         <td>{{$item->id}}</td>
         <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y H:i') }}</td>
         @if(!isset($remito))
-      <td>{{ str_pad($item->Rto_id, 6, '0', STR_PAD_LEFT) }}</td>
+      <td>{{ str_pad($item->rto->proveedores_id, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($item->rto->camion, 3, '0', STR_PAD_LEFT) }}</td>
     @endif
         <td>{{ $item->rto->proveedor->razonSocialProveedor }}</td>
         <td>{{$item->descripcionObservacionesRto}}</td>

@@ -10,8 +10,8 @@ use App\Http\Controllers\RtoController;
 use App\Http\Controllers\Usuarios;
 use App\Http\Controllers\Proveedores;
 use App\Http\Controllers\Informes;
+use App\Http\Controllers\ProductosController;
 use App\Http\Controllers\RtoDetalleController;
-use App\Models\Proveedor;
 
 // Crear usuario admin (Solo usar una vez)
 // Route::get('/crear-admin',[AuthController::class, 'crearAdmin'])->name('crear-admin');
@@ -86,4 +86,8 @@ Route::prefix('proveedores')->middleware(['auth', 'Checkrol:admin'])->group(func
 
 Route::prefix('informes')->middleware(['auth', 'Checkrol:admin'])->group(function () {
     Route::get('/', [Informes::class, 'index'])->name('informes');
+});
+
+Route::prefix('productos')->middleware(['auth', 'Checkrol:admin'])->group(function () {
+    Route::get('/', [ProductosController::class, 'index'])->name('productos');
 });

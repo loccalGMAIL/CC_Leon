@@ -8,6 +8,8 @@ class Informes extends Controller
 {
     public function index()
     {
-        return view('modules.informes.index');
+        $titulo = 'Informes';
+        return view('modules.informes.index', compact('titulo'));
+
     }
 }

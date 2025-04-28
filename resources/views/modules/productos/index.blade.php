@@ -42,6 +42,28 @@
                                     data-bs-target="#agregarRemitoModal" >
                                     <i class="fa-solid fa-circle-plus"></i> Agregar nuevo producto
                                 </a>
+                                
+                                <form action="#" method="POST">
+                                    @csrf
+                                    <div class="input-group" style="width: auto;">
+                                        <span class="input-group-text bg-primary text-white fw-bold">USD</span>
+                                        <input 
+                                            type="number" 
+                                            name="cotizacion" 
+                                            value="{{ $cotizacion ?? 1200.50 }}" 
+                                            step="0.01" 
+                                            class="form-control text-center fw-bold bg-primary text-white"
+                                            placeholder="0.00"
+                                            style="width: 6rem;"
+                                        >
+                                        <button type="submit" name="action" value="guardar" class="btn btn-success">
+                                            <i class="fa-solid fa-save"></i>
+                                        </button>
+                                        <button type="submit" name="action" value="actualizar" class="btn btn-primary">
+                                            <i class="fa-solid fa-sync-alt"></i>
+                                        </button>
+                                    </div>
+                                </form>
 
                             </div>
                             <!-- Table with stripped rows -->

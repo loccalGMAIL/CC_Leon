@@ -36,7 +36,7 @@ Route::prefix('remitos')->middleware('auth')->group(function () {
     Route::get('obtenerValor/{id}/{field}', [RtoDetalleController::class, 'obtenerValor'])->name('obtenerValor');
     Route::post('/deleteRtoDetalle/{id}', [RtoDetalleController::class, 'delete'])->name('deleteRtoDetalle');
     Route::get('pendientes', [RtoController::class, 'pendientes'])->name('remitos.pendientes');
-    Route::post('/actualizarEstado/{id}' , [RtoController::class, 'actualizarEstado'])->name('actualizarEstado');
+    Route::post('/actualizarEstado/{id}', [RtoController::class, 'actualizarEstado'])->name('actualizarEstado');
     Route::post('/remitos/actualizar/{id}', [RtoController::class, 'actualizar'])->name('actualizarRemito');
 });
 
@@ -72,7 +72,7 @@ Route::prefix('proveedores')->middleware(['auth', 'Checkrol:admin'])->group(func
     Route::post('/store', [Proveedores::class, 'store'])->name('proveedores.store');
     Route::get('/edit/{id}', [Proveedores::class, 'edit'])->name('proveedores.edit');
     Route::put('/update/{id}', [Proveedores::class, 'update'])->name('proveedores.update');
-    Route::post('/estado/{id}', [Proveedores::class, 'estado'])->name('proveedores.estado');   
+    Route::post('/estado/{id}', [Proveedores::class, 'estado'])->name('proveedores.estado');
 
     Route::get('/camiones', [Proveedores::class, 'indexCamiones'])->name('proveedores.camiones');
     Route::get('/camiones/create', [Proveedores::class, 'createCamiones'])->name('proveedores.camiones.create');
@@ -90,4 +90,6 @@ Route::prefix('informes')->middleware(['auth', 'Checkrol:admin'])->group(functio
 
 Route::prefix('productos')->middleware(['auth', 'Checkrol:admin'])->group(function () {
     Route::get('/', [ProductosController::class, 'index'])->name('productos');
+    Route::post('/cotizacion/guardar', [ProductosController::class, 'guardarCotizacion'])->name('cotizacion.guardar');
+    Route::post('/cotizacion/actualizar-externa', [ProductosController::class, 'actualizarCotizacionExterna'])->name('cotizacion.actualizar-externa');
 });

@@ -92,4 +92,8 @@ Route::prefix('productos')->middleware(['auth', 'Checkrol:admin'])->group(functi
     Route::get('/', [ProductosController::class, 'index'])->name('productos');
     Route::post('/cotizacion/guardar', [ProductosController::class, 'guardarCotizacion'])->name('cotizacion.guardar');
     Route::post('/cotizacion/actualizar-externa', [ProductosController::class, 'actualizarCotizacionExterna'])->name('cotizacion.actualizar-externa');
+    Route::post('/productos', [ProductosController::class, 'store'])->name('productos.store');
+    Route::get('/{id}/edit', [ProductosController::class, 'edit'])->name('productos.edit');
+    Route::put('/update{id}', [ProductosController::class, 'update'])->name('productos.update');
+    Route::delete('/delete{id}', [ProductosController::class, 'destroy'])->name('productos.destroy');
 });

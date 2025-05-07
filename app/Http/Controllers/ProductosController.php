@@ -3,58 +3,196 @@
 namespace App\Http\Controllers;
 use App\Models\Proveedor;
 use App\Models\Cotizacion;
-use App\Models\Rto;
+use App\Models\Producto;
+use illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 use Illuminate\Http\Request;
 
 class ProductosController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $titulo = 'Productos';
         $proveedores = Proveedor::where('estadoProveedor', '1')->get();
         $cotizacion = Cotizacion::latest()->first();
-        return view('modules.productos.index', compact('titulo', 'proveedores', 'cotizacion'));
-    }
+        $proveedorSeleccionado = $request->query('proveedor_id');
+        $productos = [];
 
-    public function create()
-    {
-        return view('productos.create');
+        // Si hay un proveedor seleccionado, cargar sus productos
+        if ($proveedorSeleccionado) {
+            $productos = Producto::where('proveedores_id', $proveedorSeleccionado)->get();
+        }
+        return view('modules.productos.index', compact(
+            'titulo',
+            'proveedores',
+            'cotizacion',
+            'productos',
+            'proveedorSeleccionado'
+        ));
     }
-
+    /**
+     * Almacena un nuevo producto en la base de datos
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function store(Request $request)
     {
-        // Aquí puedes manejar la lógica para almacenar el producto
-        // Por ejemplo, guardar en la base de datos
+        // Validar los datos de entrada
+        $validated = $request->validate([
+            'proveedores_id' => 'required|exists:proveedores,id',
+            'codigo' => 'nullable|string|max:255|unique:productos,codigo',
+            'codigoBarras' => 'nullable|integer|unique:productos,codigoBarras',
+            'nombre' => 'required|string|max:255',
+            'costoDlrs' => 'required|numeric|min:0',
+            'TC' => 'required|numeric|min:0',
+            'costo' => 'required|numeric|min:0',
+            'modificacion' => 'nullable|date',
+        ]);
 
-        return redirect()->route('productos.index')->with('success', 'Producto creado exitosamente.');
+        try {
+            // Crear el nuevo producto
+            $producto = new Producto();
+            $producto->proveedores_id = $request->proveedores_id;
+            $producto->codigo = $request->codigo;
+            $producto->codigoBarras = $request->codigoBarras;
+            $producto->nombre = $request->nombre;
+            $producto->costoDlrs = $request->costoDlrs;
+            $producto->TC = $request->TC;
+            $producto->costo = $request->costo;
+            $producto->modificacion = $request->modificacion;
+
+            $producto->save();
+
+            // Redireccionar de vuelta con mensaje de éxito
+            return redirect()->route('productos', ['proveedor_id' => $request->proveedores_id])
+                ->with('swal_success', 'Producto agregado correctamente');
+        } catch (\Exception $e) {
+            // Log del error
+            Log::error('Error al guardar producto: ' . $e->getMessage());
+
+            // Redireccionar de vuelta con mensaje de error
+            return redirect()->back()
+                ->with('swal_error', 'Error al guardar el producto: ' . $e->getMessage())
+                ->withInput();
+        }
     }
 
-    public function show($id)
-    {
-        return view('productos.show', compact('id'));
-    }
-
+    /**
+     * Obtiene los datos de un producto para edición
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function edit($id)
     {
-        return view('productos.edit', compact('id'));
+        try {
+            $producto = Producto::findOrFail($id);
+            return response()->json($producto);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Producto no encontrado'], 404);
+        }
     }
-
+    /**
+     * Actualiza un producto existente en la base de datos
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function update(Request $request, $id)
     {
-        // Aquí puedes manejar la lógica para actualizar el producto
-        // Por ejemplo, actualizar en la base de datos
+        $validated = $request->validate([
+            'codigo' => 'nullable|string|max:255|unique:productos,codigo,' . $id,
+            'codigoBarras' => 'nullable|integer|unique:productos,codigoBarras,' . $id,
+            'nombre' => 'required|string|max:255',
+            'costoDlrs' => 'required|numeric|min:0',
+            'TC' => 'required|numeric|min:0',
+            'costo' => 'required|numeric|min:0',
+            'modificacion' => 'nullable|date',
+        ]);
 
-        return redirect()->route('productos.index')->with('success', 'Producto actualizado exitosamente.');
+        try {
+            $producto = Producto::findOrFail($id);
+
+            $producto->codigo = $request->codigo;
+            $producto->codigoBarras = $request->codigoBarras;
+            $producto->nombre = $request->nombre;
+            $producto->costoDlrs = $request->costoDlrs;
+            $producto->TC = $request->TC;
+            $producto->costo = $request->costo;
+            $producto->modificacion = $request->modificacion ?: now();
+
+            $producto->save();
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Producto actualizado correctamente',
+                    'producto' => $producto
+                ]);
+            }
+
+            // Redirigir a la vista del proveedor seleccionado
+            return redirect()->route('productos', ['proveedor_id' => $producto->proveedores_id])
+                ->with('swal_success', 'Producto actualizado correctamente');
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar producto: ' . $e->getMessage());
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'error' => 'Error al actualizar el producto: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->back()->withErrors(['error' => 'Error al actualizar el producto']);
+        }
     }
-
+    /**
+     * Elimina un producto de la base de datos
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function destroy($id)
     {
-        // Aquí puedes manejar la lógica para eliminar el producto
-        // Por ejemplo, eliminar de la base de datos
+        try {
+            $producto = Producto::findOrFail($id);
+            $proveedorId = $producto->proveedores_id;
 
-        return redirect()->route('productos.index')->with('success', 'Producto eliminado exitosamente.');
+            $producto->delete();
+
+            // Redirigir a la vista del proveedor seleccionado
+            return redirect()->route('productos', ['proveedor_id' => $producto->proveedores_id])
+                ->with('swal_success', 'Producto borrado correctamente');
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar producto: ' . $e->getMessage());
+
+            return redirect()->back()->withErrors(['error' => 'Error al borrar el producto']);
+
+        }
     }
+
+    // public function guardarCotizacion(Request $request)
+    // {
+    //     // Validar el valor recibido
+    //     $request->validate([
+    //         'cotizacion' => 'required|numeric|min:0',
+    //     ]);
+
+    //     // Buscar la cotización existente o crear una nueva
+    //     $cotizacion = Cotizacion::first();
+    //     if (!$cotizacion) {
+    //         $cotizacion = new Cotizacion();
+    //     }
+
+    //     $cotizacion->precioDolar = $request->cotizacion;
+    //     $cotizacion->save();
+
+    //     // Configurar SweetAlert para la confirmación
+    //     return redirect()->back()->with('swal_success', 'Cotización del dólar actualizada correctamente');
+    // }
+
 
     public function guardarCotizacion(Request $request)
     {
@@ -62,19 +200,47 @@ class ProductosController extends Controller
         $request->validate([
             'cotizacion' => 'required|numeric|min:0',
         ]);
-
-        // Buscar la cotización existente o crear una nueva
-        $cotizacion = Cotizacion::first();
-        if (!$cotizacion) {
-            $cotizacion = new Cotizacion();
+        
+        try {
+            // Comenzar una transacción de base de datos
+            DB::beginTransaction();
+            
+            // Buscar la cotización existente o crear una nueva
+            $cotizacion = Cotizacion::first();
+            if (!$cotizacion) {
+                $cotizacion = new Cotizacion();
+            }
+            
+            // Guardar el nuevo valor de cotización
+            $cotizacion->precioDolar = $request->cotizacion;
+            $cotizacion->save();
+            
+            // Actualizar el TC y recalcular el costo en todos los productos
+            $productos = Producto::all();
+            foreach ($productos as $producto) {
+                $producto->TC = $request->cotizacion;
+                $producto->costo = $producto->costoDlrs * $request->cotizacion;
+                $producto->save();
+            }
+            
+            // Confirmar la transacción
+            DB::commit();
+            
+            // Configurar SweetAlert para la confirmación
+            return redirect()->back()->with('swal_success', 'Cotización del dólar actualizada correctamente y precios recalculados');
+        } catch (\Exception $e) {
+            // Revertir la transacción en caso de error
+            DB::rollback();
+            
+            // Log del error
+            Log::error('Error al actualizar cotización y productos: ' . $e->getMessage());
+            
+            // Retornar con mensaje de error
+            return redirect()->back()->with('swal_error', 'Error al actualizar la cotización: ' . $e->getMessage());
         }
-
-        $cotizacion->precioDolar = $request->cotizacion;
-        $cotizacion->save();
-
-        // Configurar SweetAlert para la confirmación
-        return redirect()->back()->with('swal_success', 'Cotización del dólar actualizada correctamente');
     }
+
+
 
     public function actualizarCotizacionExterna(Request $request)
     {
@@ -94,7 +260,7 @@ class ProductosController extends Controller
 
             return redirect()->back()->with('swal_success', "Cotización actualizada a $nuevaCotizacion (Banco Nación)");
         } catch (\Exception $e) {
-            \Log::error('Error al actualizar cotización externa: ' . $e->getMessage());
+            Log::error('Error al actualizar cotización externa: ' . $e->getMessage());
             return redirect()->back()->with('swal_error', 'Error al actualizar la cotización: ' . $e->getMessage());
         }
     }
